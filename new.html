@@ -2790,298 +2790,205 @@
   <script>
     // Default Scenarios
     const defaultScenarios = {
-      doctor: {
-        "scenario_title": "Shingrix Vaccine Counseling",
-        "description": "Interactive physician-patient training scenario for counseling on Shingrix vaccine.",
-        "scoring_rules": {
-          "weights": {
-            "High": 3,
-            "Medium": 2,
-            "Low": 1
-          },
-          "levels": {
-            "Good": 3,
-            "Medium": 2,
-            "Low": 1,
-            "Bad": 0
-          }
+      saad: {
+  scenario_title: "SAAD Scenario",
+  description: "Advanced counseling scenario with Mr. Saad around shingles risk and vaccination.",
+  scoring_rules: {
+    weights: { High: 3, Medium: 2, Low: 1 },
+    levels: { Good: 3, Medium: 2, Low: 1, Bad: 0 }
+  },
+  steps: [
+    {
+      id: "greeting",
+      speaker: "bot",
+      message: "Good morning, Mr. Saad. How are you doing?",
+      responses: [
+        {
+          text: "Long time no see, Mr. Saad. I hope you’re in good health!",
+          next: "feeling",
+          tag: "Opportunity",
+          score_weight: "High",
+          score_level: "Good"
         },
-        "steps": [
-          {
-            "id": "greeting",
-            "speaker": "bot",
-            "message": "Good morning, Mr. Saad. How are you doing today?",
-            "responses": [
-              {
-                "text": "Long time no see, doctor! I'm okay, I guess.",
-                "next": "exploration",
-                "tag": "Burden - Risk",
-                "score_weight": "High",
-                "score_level": "Good",
-                "cta": "",
-                "feedback": "Excellent opening - establishes rapport and shows genuine concern"
-              },
-              {
-                "text": "Can you get to the point, doctor? I don't have all day.",
-                "next": "exploration",
-                "tag": "Burden - Risk",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "cta": "",
-                "feedback": "Too abrupt - lacks empathy and proper greeting"
-              }
-            ]
-          },
-          {
-            "id": "exploration",
-            "speaker": "bot",
-            "message": "I wanted to check in on your health and see how you've been managing your lung condition.",
-            "responses": [
-              {
-                "text": "Not great, honestly. I feel my age.",
-                "next": "education",
-                "tag": "Burden - Symptoms & Complications",
-                "score_weight": "High",
-                "score_level": "Medium",
-                "cta": "",
-                "feedback": "Good empathy - validates patient feelings"
-              },
-              {
-                "text": "I'm fine, why ask?",
-                "next": "education",
-                "tag": "Burden - Risk",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "cta": "",
-                "feedback": "Dismissive - doesn't engage with patient concerns"
-              }
-            ]
-          },
-          {
-            "id": "education",
-            "speaker": "bot",
-            "message": "Did you know shingles is a painful rash that can result from the chickenpox virus reactivating? 1 in 3 adults will develop it.",
-            "responses": [
-              {
-                "text": "That sounds bad. Can it affect my daily life?",
-                "next": "solution",
-                "tag": "Burden - Impact on Quality of Life",
-                "score_weight": "High",
-                "score_level": "Good",
-                "cta": "",
-                "feedback": "Excellent engagement - shows understanding of patient concerns"
-              },
-              {
-                "text": "I'll deal with it if it happens.",
-                "next": "solution",
-                "tag": "Burden - Symptoms",
-                "score_weight": "High",
-                "score_level": "Medium",
-                "cta": "",
-                "feedback": "Underestimates severity - needs more education"
-              }
-            ]
-          },
-          {
-            "id": "solution",
-            "speaker": "bot",
-            "message": "There's a vaccine called Shingrix — a 2-dose vaccine that's more than 90% effective for people over 50.",
-            "responses": [
-              {
-                "text": "How do you intend to protect me with that?",
-                "next": "objection",
-                "tag": "Solution",
-                "score_weight": "High",
-                "score_level": "Medium",
-                "cta": "",
-                "feedback": "Shows interest but needs more information"
-              },
-              {
-                "text": "I'm too old for vaccines.",
-                "next": "objection",
-                "tag": "Solution",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "cta": "",
-                "feedback": "Ageism concern - needs reassurance about vaccine benefits"
-              }
-            ]
-          },
-          {
-            "id": "objection",
-            "speaker": "bot",
-            "message": "The Shingrix vaccine is safe, well-tested, and effective even for people over 70. Side effects are usually mild.",
-            "responses": [
-              {
-                "text": "That's reassuring. Maybe it's worth it.",
-                "next": "closing",
-                "tag": "Safety",
-                "score_weight": "Medium",
-                "score_level": "Good",
-                "cta": "",
-                "feedback": "Good - safety concerns addressed effectively"
-              },
-              {
-                "text": "I don't like vaccines.",
-                "next": "closing",
-                "tag": "Safety",
-                "score_weight": "Medium",
-                "score_level": "Bad",
-                "cta": "",
-                "feedback": "Persistent resistance - needs more education"
-              }
-            ]
-          },
-          {
-            "id": "closing",
-            "speaker": "bot",
-            "message": "I'm glad we talked. Shingrix can protect you and help you stay active without worrying about shingles.",
-            "responses": [
-              {
-                "text": "Alright, let's do it.",
-                "next": "end",
-                "tag": "Solution",
-                "score_weight": "High",
-                "score_level": "Good",
-                "cta": "Schedule vaccination",
-                "feedback": "Excellent outcome - patient accepts recommendation"
-              },
-              {
-                "text": "Maybe next time.",
-                "next": "end",
-                "tag": "Solution",
-                "score_weight": "High",
-                "score_level": "Medium",
-                "cta": "",
-                "feedback": "Partial success - patient needs follow-up"
-              }
-            ]
-          },
-          {
-            "id": "end",
-            "speaker": "bot",
-            "message": "Thank you for your time today, Mr. Saad. Take care!",
-            "responses": []
-          }
-        ]
-      },
-      nurse: {
-        "scenario_title": "Nurse Scenario",
-        "description": "Nurse–Patient roleplay scenario for vaccine education and administration.",
-        "scoring_rules": {
-          "weights": {
-            "High": 3,
-            "Medium": 2,
-            "Low": 1
-          },
-          "levels": {
-            "Good": 3,
-            "Medium": 2,
-            "Low": 1,
-            "Bad": 0
-          }
+        {
+          text: "Can you get to the point, doctor? I am an old man, but that doesn’t mean I have all day.",
+          next: "feeling",
+          tag: "Danger",
+          score_weight: "High",
+          score_level: "Bad"
+        }
+      ]
+    },
+    {
+      id: "feeling",
+      speaker: "bot",
+      message: "Honestly? Feeling my age, I don’t think I am doing well.",
+      responses: [
+        {
+          text: "Your age and lung history puts you at severe risks like shingles.",
+          next: "shingles1",
+          tag: "Danger",
+          score_weight: "High",
+          score_level: "Good"
         },
-        "steps": [
-          {
-            "id": "start",
-            "speaker": "bot",
-            "message": "You are the nurse. The doctor has discussed shingles vaccination with Mr. Saad, who has agreed to proceed. Your role is to provide education and administer the vaccine.",
-            "responses": [
-              {
-                "text": "Hello Mr. Saad, I'm here to give you your shingles vaccine today.",
-                "next": "1",
-                "tag": "Education",
-                "score_weight": "High",
-                "score_level": "Good",
-                "feedback": "Professional introduction - sets clear expectations"
-              },
-              {
-                "text": "Ready for your shot? Roll up your sleeve.",
-                "next": "1",
-                "tag": "Education",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "feedback": "Too casual - lacks professional approach"
-              }
-            ]
-          },
-          {
-            "id": "1",
-            "speaker": "patient",
-            "message": "Hello. Yes, the doctor said it would be a good idea. I'm a bit nervous about vaccines though - my wife had a bad reaction to a flu shot once.",
-            "responses": [
-              {
-                "text": "I understand your concern. This vaccine is very safe, and shingles can be much worse than any side effects.",
-                "next": "2",
-                "tag": "Safety",
-                "score_weight": "High",
-                "score_level": "Good",
-                "feedback": "Excellent empathy - validates concerns while educating"
-              },
-              {
-                "text": "Don't worry, this one is different. You'll be fine.",
-                "next": "2",
-                "tag": "Safety",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "feedback": "Dismissive - doesn't properly address concerns"
-              }
-            ]
-          },
-          {
-            "id": "2",
-            "speaker": "patient",
-            "message": "I suppose you're right. My wife did say the shingles pain was unbearable. What exactly should I expect?",
-            "responses": [
-              {
-                "text": "You'll get a shot in your arm. You might have some soreness for a day or two.",
-                "next": "3",
-                "tag": "Education",
-                "score_weight": "High",
-                "score_level": "Good",
-                "feedback": "Clear, concise information - manages expectations"
-              },
-              {
-                "text": "It's just a shot. Your arm might be sore for a bit.",
-                "next": "3",
-                "tag": "Education",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "feedback": "Too simplistic - lacks proper patient education"
-              }
-            ]
-          },
-          {
-            "id": "3",
-            "speaker": "patient",
-            "message": "That sounds manageable. I'm ready to proceed when you are.",
-            "responses": [
-              {
-                "text": "Great. I'll give you the shot now and we'll watch you for a few minutes.",
-                "next": "end",
-                "tag": "Administration",
-                "score_weight": "High",
-                "score_level": "Good",
-                "feedback": "Proper protocol - includes observation period"
-              },
-              {
-                "text": "Okay, hold still. This will be quick.",
-                "next": "end",
-                "tag": "Administration",
-                "score_weight": "High",
-                "score_level": "Bad",
-                "feedback": "Abrupt - lacks proper communication"
-              }
-            ]
-          },
-          {
-            "id": "end",
-            "speaker": "bot",
-            "message": "Vaccine administered successfully. You provided comprehensive patient education and followed proper protocols.",
-            "responses": []
-          }
-        ]
-      }
+        {
+          text: "Given the history of your lung conditions, you must not be doing your best.",
+          next: "shingles1",
+          tag: "Danger",
+          score_weight: "High",
+          score_level: "Medium"
+        }
+      ]
+    },
+    {
+      id: "shingles1",
+      speaker: "bot",
+      message: "Shingles is a painful rash that results from the childhood chickenpox virus reactivating. Luckily, it's preventable.",
+      responses: [
+        {
+          text: "How does that prevent me from living life to the fullest?",
+          next: "shingles2",
+          tag: "Opportunity",
+          score_weight: "Medium",
+          score_level: "Medium"
+        },
+        {
+          text: "Can you tell me more about it?",
+          next: "shingles2",
+          tag: "Opportunity",
+          score_weight: "High",
+          score_level: "Good"
+        }
+      ]
+    },
+    {
+      id: "shingles2",
+      speaker: "bot",
+      message: "Our immune systems weaken with age, making us more prone to dormant virus reactivation like shingles.",
+      responses: [
+        {
+          text: "Healthy ageing still sounds like a myth to me.",
+          next: "vaccineIntro",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Bad"
+        },
+        {
+          text: "I’ll just deal with it if I get shingles. It can’t be that bad, right?",
+          next: "vaccineIntro",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Bad"
+        }
+      ]
+    },
+    {
+      id: "vaccineIntro",
+      speaker: "bot",
+      message: "Shingrix is a 2-dose vaccine that is >90% effective against shingles for individuals over 50 and those with chronic conditions.",
+      responses: [
+        {
+          text: "And how do you intend to “protect” me from this?",
+          next: "vaccineDefense",
+          tag: "Opportunity",
+          score_weight: "High",
+          score_level: "Medium"
+        },
+        {
+          text: "You do know how to bring a solid offer to the table, don’t you?",
+          next: "vaccineDefense",
+          tag: "Opportunity",
+          score_weight: "High",
+          score_level: "Good"
+        }
+      ]
+    },
+    {
+      id: "vaccineDefense",
+      speaker: "bot",
+      message: "Shingrix offers long-lasting shingles protection to prevent a painful rash that could impact your life for weeks or months.",
+      responses: [
+        {
+          text: "I'm too old for vaccines. Is it even worth it at this point?",
+          next: "hesitation",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Bad"
+        },
+        {
+          text: "I don't have time for another visit and the whole vaccine process.",
+          next: "hesitation",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Medium"
+        }
+      ]
+    },
+    {
+      id: "hesitation",
+      speaker: "bot",
+      message: "Shingrix is effective for those over 70, greatly reducing shingles risk and preventing complications. You only need 2 visits.",
+      responses: [
+        {
+          text: "I already had chickenpox as a kid, isn't that enough immunity?",
+          next: "chickenpox",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Medium"
+        },
+        {
+          text: "I understand, but I don’t think I really need it…",
+          next: "chickenpox",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Low"
+        }
+      ]
+    },
+    {
+      id: "chickenpox",
+      speaker: "bot",
+      message: "Having chickenpox means the varicella-zoster virus lingers in your nerves, potentially turning into shingles. Shingrix lowers your risk.",
+      responses: [
+        {
+          text: "Vaccines and chemicals… I never liked vaccines.",
+          next: "finalPush",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Bad"
+        },
+        {
+          text: "I don't get sick often, so why bother with the vaccine?",
+          next: "finalPush",
+          tag: "Danger",
+          score_weight: "Medium",
+          score_level: "Low"
+        }
+      ]
+    },
+    {
+      id: "finalPush",
+      speaker: "bot",
+      message: "Shingrix has passed extensive safety tests. Side effects are usually mild and brief. The benefits far outweigh the risks.",
+      responses: [
+        {
+          text: "I get your point, doctor. I think I need Shingrix.",
+          next: "end",
+          tag: "Solution",
+          score_weight: "High",
+          score_level: "Good",
+          cta: "Schedule vaccine"
+        }
+      ]
+    },
+    {
+      id: "end",
+      speaker: "bot",
+      message: "Thank you for your time, Mr. Saad. Let's get you protected.",
+      responses: []
+    }
+  ]
+}
     };
 
     const defaultTagMapping = {
