@@ -1,0 +1,4603 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shing-chat - Medical Training Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #1e293b;
+      --gray-900: #0f172a;
+      --gray-800: #1e293b;
+      --gray-700: #334155;
+      --gray-600: #475569;
+      --gray-500: #64748b;
+      --gray-400: #94a3b8;
+      --gray-300: #cbd5e1;
+      --gray-200: #e2e8f0;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      color: var(--gray-800);
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 800px;
+      height: 90vh;
+      min-height: 600px;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+      display: flex;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 1rem;
+      background: none;
+      border: none;
+      color: var(--gray-600);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-2);
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Chat Header */
+    .chat-header {
+      background: var(--white);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .bot-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.2rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .bot-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bot-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .bot-status {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .header-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--gray-100);
+      border: none;
+      border-radius: 50%;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--gray-200);
+      transform: scale(1.05);
+    }
+
+    /* Messages Area */
+    .messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: var(--gray-50);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .messages-area::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .messages-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-area::-webkit-scrollbar-thumb {
+      background: var(--gray-300);
+      border-radius: 2px;
+    }
+
+    .messages-area::-webkit-scrollbar-thumb:hover {
+      background: var(--gray-400);
+    }
+
+    .message {
+      display: flex;
+      gap: 0.75rem;
+      animation: messageIn 0.3s ease-out;
+      max-width: 75%;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.bot {
+      align-self: flex-start;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .bot-message-avatar {
+      background: var(--gradient-2);
+      color: var(--white);
+    }
+
+    .user-message-avatar {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .message-content {
+      flex: 1;
+    }
+
+    .message-bubble {
+      padding: 0.75rem 1rem;
+      border-radius: 18px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .message.bot .message-bubble {
+      background: var(--white);
+      color: var(--gray-800);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user .message-bubble {
+      background: var(--gradient-2);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-bubble:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    .response-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      margin-top: 8px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: var(--white);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .response-tag:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+      background: var(--primary-dark);
+    }
+
+    .message.bot .message-time {
+      color: var(--gray-500);
+    }
+
+    .message.user .message-time {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Enhanced Typing Indicator */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 0.2rem;
+      padding: 0.75rem 1rem;
+      background: var(--white);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .typing-dots::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.7;
+      }
+      30% {
+        transform: translateY(-8px) scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    /* Typing Status Text */
+    .typing-status {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      font-style: italic;
+    }
+
+    /* Response Area */
+    .response-container {
+      padding: 1.5rem;
+      background: var(--white);
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .response-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .response-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .response-btn {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 20px;
+      color: var(--gray-700);
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .response-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-2);
+      transition: left 0.3s ease;
+      z-index: -1;
+    }
+
+    .response-btn:hover {
+      color: var(--white);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .response-btn:hover::before {
+      left: 0;
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .welcome-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.75rem;
+    }
+
+    .welcome-description {
+      font-size: 1rem;
+      color: var(--gray-600);
+      max-width: 450px;
+      margin-bottom: 1.5rem;
+    }
+
+    .scenario-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .scenario-card {
+      padding: 1.25rem;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      min-width: 180px;
+    }
+
+    .scenario-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .scenario-card.selected {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .scenario-icon {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .scenario-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .scenario-desc {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .start-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--gradient-2);
+      color: var(--white);
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .start-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Score Modal */
+    .score-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .score-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .score-content {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: var(--shadow-2xl);
+      animation: scaleIn 0.3s ease;
+      text-align: center;
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .score-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--gradient-2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.5rem;
+      margin: 0 auto 1.5rem;
+      animation: bounce 1s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .score-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: var(--gradient-2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0.5rem 0;
+    }
+
+    .score-message {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    .score-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+      padding: 0.75rem;
+      background: var(--gray-50);
+      border-radius: 10px;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .score-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--gradient-2);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    /* Feedback Section */
+    .feedback-section {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--gray-50);
+      border-radius: 10px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .feedback-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .feedback-item {
+      display: flex;
+      align-items: start;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    .feedback-icon {
+      color: var(--primary);
+      margin-top: 2px;
+    }
+
+    /* Admin Dashboard Styles */
+    .admin-header {
+      padding: 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .admin-btn {
+      padding: 0.5rem 1rem;
+      background: var(--gradient-2);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .admin-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .admin-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: var(--gray-50);
+    }
+
+    .scenarios-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .scenario-item {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .scenario-item:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .scenario-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .scenario-item-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .scenario-item-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      background: var(--gray-100);
+      border: none;
+      border-radius: 50%;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--gray-200);
+      transform: scale(1.05);
+    }
+
+    .icon-btn.delete:hover {
+      background: var(--danger);
+      color: var(--white);
+    }
+
+    .scenario-item-description {
+      color: var(--gray-600);
+      margin-bottom: 1rem;
+    }
+
+    .scenario-stats {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .scenario-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--gray-500);
+    }
+
+    /* Analytics Dashboard Styles */
+    .analytics-header {
+      padding: 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .analytics-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .analytics-filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    .filter-select {
+      padding: 0.5rem;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+    }
+
+    .analytics-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: var(--gray-50);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-card-title {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .stat-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .stat-card-icon.primary {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+    }
+
+    .stat-card-icon.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .stat-card-icon.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .stat-card-icon.danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .stat-card-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-card-change {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .stat-card-change.positive {
+      color: var(--success);
+    }
+
+    .stat-card-change.negative {
+      color: var(--danger);
+    }
+
+    .chart-container {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .chart-options {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-option {
+      padding: 0.25rem 0.75rem;
+      background: var(--gray-100);
+      border: none;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chart-option.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .chart-canvas {
+      height: 250px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .chart-bar {
+      flex: 1;
+      background: var(--gradient-2);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .chart-bar:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+
+    .chart-bar-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    .chart-bar-value {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .sessions-table {
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-header {
+      padding: 1rem 1.5rem;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .table-btn {
+      padding: 0.25rem 0.75rem;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .table-btn:hover {
+      background: var(--gray-100);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--gray-50);
+    }
+
+    th {
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--gray-100);
+      font-size: 0.85rem;
+      color: var(--gray-700);
+    }
+
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: var(--gray-50);
+    }
+
+    .score-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .score-badge.high {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .score-badge.medium {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .score-badge.low {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .scenario-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: var(--gray-100);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    /* Tag Performance Styles */
+    .tag-performance-item {
+      background: var(--gray-50);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .tag-performance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .tag-name {
+      font-weight: 600;
+      color: var(--gray-800);
+      font-size: 0.9rem;
+    }
+
+    .tag-stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+    }
+
+    .tag-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag-progress-fill {
+      height: 100%;
+      background: var(--gradient-2);
+      transition: width 0.3s ease;
+    }
+
+    .tag-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    /* Documentation Styles */
+    .docs-header {
+      padding: 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .docs-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .docs-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .docs-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+      background: var(--white);
+    }
+
+    .doc-section {
+      margin-bottom: 3rem;
+    }
+
+    .doc-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .doc-section h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin: 1.5rem 0 1rem 0;
+    }
+
+    .doc-section h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin: 1rem 0 0.5rem 0;
+    }
+
+    .doc-section p {
+      margin-bottom: 1rem;
+      line-height: 1.7;
+      color: var(--gray-600);
+    }
+
+    .doc-section ul, .doc-section ol {
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+      color: var(--gray-600);
+    }
+
+    .doc-section li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    .doc-section code {
+      background: var(--gray-100);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: var(--primary);
+    }
+
+    .doc-section pre {
+      background: var(--gray-900);
+      color: var(--gray-100);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .doc-section pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .doc-section table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+    }
+
+    .doc-section th, .doc-section td {
+      padding: 0.75rem;
+      text-align: left;
+      border: 1px solid var(--gray-200);
+    }
+
+    .doc-section th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .formula-box {
+      background: var(--gray-50);
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      text-align: center;
+    }
+
+    .formula-box .formula {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.5rem;
+    }
+
+    .formula-box .description {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    .example-box {
+      background: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--success);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+
+    .example-box h4 {
+      color: var(--success);
+      margin-top: 0;
+    }
+
+    .warning-box {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--warning);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+
+    .warning-box h4 {
+      color: var(--warning);
+      margin-top: 0;
+    }
+
+    /* Scenario Editor Modal */
+    .editor-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .editor-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .editor-content {
+      background: var(--white);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      box-shadow: var(--shadow-2xl);
+      animation: scaleIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      padding: 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .editor-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .editor-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .editor-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .editor-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--gray-800);
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step-item {
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-id {
+      background: var(--primary);
+      color: var(--white);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .step-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .responses-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .response-item {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 0.75rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .response-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .response-text {
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .response-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .response-tag {
+      background: var(--gray-100);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .editor-footer {
+      padding: 1.5rem;
+      background: var(--white);
+      border-top: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* Tag Score Display */
+    .tag-score {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .tag-score.high {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .tag-score.medium {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .tag-score.low {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+    }
+
+    .toast-icon.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .toast-icon.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .toast-message {
+      font-size: 0.875rem;
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .app-container {
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      .chat-header {
+        padding: 1rem;
+      }
+
+      .bot-name {
+        font-size: 1rem;
+      }
+
+      .messages-area {
+        padding: 1rem;
+      }
+
+      .message {
+        max-width: 85%;
+      }
+
+      .response-container {
+        padding: 1rem;
+      }
+
+      .scenario-selector {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .scenario-card {
+        width: 100%;
+      }
+
+      .score-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-content {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+
+      .scenario-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .analytics-filters {
+        flex-direction: column;
+      }
+
+      .table-container {
+        overflow-x: scroll;
+      }
+
+      th, td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .toast {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+      }
+
+      .docs-content {
+        padding: 1rem;
+      }
+    }
+  </style>
+  </head>
+  <body>
+  <div class="app-container">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button class="tab-btn active" onclick="switchTab('chat')">
+        <i class="fas fa-comments"></i> Chat
+      </button>
+      <button class="tab-btn" onclick="switchTab('admin')">
+        <i class="fas fa-cog"></i> Admin
+      </button>
+      <button class="tab-btn" onclick="switchTab('analytics')">
+        <i class="fas fa-chart-line"></i> Analytics
+      </button>
+      <button class="tab-btn" onclick="switchTab('docs')">
+        <i class="fas fa-book"></i> Documentation
+      </button>
+    </div>
+
+    <!-- Chat Tab Content -->
+    <div class="tab-content active" id="chat-tab">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="header-left">
+          <div class="bot-avatar">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+          <div class="bot-info">
+            <div class="bot-name">shing-chat</div>
+            <div class="bot-status">
+              <span class="status-dot"></span>
+              <span>Online</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="resetChat()" aria-label="Reset chat">
+            <i class="fas fa-redo"></i>
+          </button>
+          <button class="header-btn" onclick="showInfo()" aria-label="Information">
+            <i class="fas fa-info"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Messages Area -->
+      <main class="messages-area" id="messages-area">
+        <div class="welcome-screen" id="welcome-screen">
+          <div class="welcome-icon">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+          <h2 class="welcome-title">shing-chat</h2>
+          <p class="welcome-description">
+            Practice your clinical communication skills with AI-powered scenarios
+          </p>
+          
+          <div class="scenario-selector" id="scenario-selector">
+            <!-- Scenarios will be dynamically loaded here -->
+          </div>
+          
+          <button class="start-btn" id="start-btn" onclick="startChat()" disabled>
+            Select a scenario to begin
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Enhanced Typing Indicator -->
+        <div class="typing-indicator" id="typing-indicator">
+          <div class="bot-message-avatar">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+          <div>
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+            <div class="typing-status" id="typing-status">Typing...</div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Response Area -->
+      <div class="response-container" id="response-container">
+        <div class="response-label">
+          <i class="fas fa-comment-medical"></i>
+          Choose your response
+        </div>
+        <div class="response-options" id="response-options"></div>
+      </div>
+    </div>
+
+    <!-- Admin Tab Content -->
+    <div class="tab-content" id="admin-tab">
+      <div class="admin-header">
+        <h2 class="admin-title">
+          <i class="fas fa-cog"></i>
+          Admin Dashboard
+        </h2>
+        <div class="admin-actions">
+          <button class="admin-btn" onclick="openNewScenarioModal()">
+            <i class="fas fa-plus"></i>
+            New Scenario
+          </button>
+        </div>
+      </div>
+      <div class="admin-content">
+        <div class="scenarios-list" id="scenarios-list">
+          <!-- Scenarios will be dynamically loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab Content -->
+    <div class="tab-content" id="analytics-tab">
+      <div class="analytics-header">
+        <h2 class="analytics-title">
+          <i class="fas fa-chart-line"></i>
+          Analytics Dashboard
+        </h2>
+        <div class="analytics-filters">
+          <div class="filter-group">
+            <label class="filter-label">Time Period:</label>
+            <select class="filter-select" id="time-filter" onchange="updateAnalytics()">
+              <option value="7">Last 7 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="all">All time</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Scenario:</label>
+            <select class="filter-select" id="scenario-filter" onchange="updateAnalytics()">
+              <option value="all">All Scenarios</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-content">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Total Sessions</span>
+              <div class="stat-card-icon primary">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="total-sessions">0</div>
+            <div class="stat-card-change" id="sessions-change">+0% from last period</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Average Score</span>
+              <div class="stat-card-icon success">
+                <i class="fas fa-trophy"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="avg-score">0%</div>
+            <div class="stat-card-change" id="score-change">+0% from last period</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Avg. Duration</span>
+              <div class="stat-card-icon warning">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="avg-duration">0s</div>
+            <div class="stat-card-change" id="duration-change">+0% from last period</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Completion Rate</span>
+              <div class="stat-card-icon danger">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="completion-rate">0%</div>
+            <div class="stat-card-change" id="completion-change">+0% from last period</div>
+          </div>
+        </div>
+
+        <!-- Score Distribution Chart -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3 class="chart-title">Score Distribution</h3>
+            <div class="chart-options">
+              <button class="chart-option active" onclick="switchChart('score')">Scores</button>
+              <button class="chart-option" onclick="switchChart('time')">Time</button>
+              <button class="chart-option" onclick="switchChart('tags')">Tags</button>
+            </div>
+          </div>
+          <div class="chart-canvas" id="chart-canvas">
+            <!-- Chart bars will be dynamically generated -->
+          </div>
+        </div>
+
+        <!-- Tag Performance Chart -->
+        <div class="chart-container" id="tag-performance-container">
+          <div class="chart-header">
+            <h3 class="chart-title">
+              <i class="fas fa-tags"></i>
+              Tag Performance Analysis
+            </h3>
+          </div>
+          <div id="tag-performance-chart">
+            <!-- Tag performance will be dynamically generated -->
+          </div>
+        </div>
+
+        <!-- Sessions Table -->
+  =======
+        <div class="sessions-table">
+          <div class="table-header">
+            <h3 class="table-title">Recent Sessions</h3>
+            <div class="table-actions">
+              <button class="table-btn" onclick="exportData()">
+                <i class="fas fa-download"></i> Export
+              </button>
+              <button class="table-btn" onclick="clearHistory()">
+                <i class="fas fa-trash"></i> Clear
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Scenario</th>
+                  <th>Score</th>
+                  <th>Duration</th>
+                  <th>Responses</th>
+                  <th>Performance</th>
+                </tr>
+              </thead>
+              <tbody id="sessions-tbody">
+                <!-- Sessions will be dynamically loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentation Tab Content -->
+    <div class="tab-content" id="docs-tab">
+      <div class="docs-header">
+        <h2 class="docs-title">
+          <i class="fas fa-book"></i>
+          Scoring System Documentation
+        </h2>
+        <div class="docs-actions">
+          <button class="admin-btn" onclick="downloadScoringDoc()">
+            <i class="fas fa-download"></i>
+            Download Word Document
+          </button>
+        </div>
+      </div>
+      <div class="docs-content">
+        <div class="doc-section">
+          <h2>Overview</h2>
+          <p>
+            The shing-chat scoring system is designed to provide objective, consistent evaluation of clinical communication skills 
+            during roleplay scenarios. This document explains how scores are calculated, weighted, and interpreted.
+          </p>
+          
+          <h3>Purpose</h3>
+          <ul>
+            <li>Provide standardized evaluation of clinical communication</li>
+            <li>Offer immediate, actionable feedback</li>
+            <li>Track progress over time</li>
+            <li>Identify areas for improvement</li>
+            <li>Maintain fairness and consistency across sessions</li>
+          </ul>
+        </div>
+
+        <div class="doc-section">
+          <h2>Scoring Architecture</h2>
+          
+          <h3>Core Components</h3>
+          <p>The scoring system consists of two main components:</p>
+          
+          <div class="formula-box">
+            <div class="formula">Response Score = Weight × Level</div>
+            <div class="description">Each response is evaluated based on its importance (weight) and quality (level)</div>
+          </div>
+          
+          <h4>1. Weight Categories</h4>
+          <p>Weights determine the relative importance of different communication moments:</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Weight</th>
+                <th>Value</th>
+                <th>Description</th>
+                <th>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>High</strong></td>
+                <td>3 points</td>
+                <td>Critical communication moments</td>
+                <td>Building rapport, key decisions, safety concerns</td>
+              </tr>
+              <tr>
+                <td><strong>Medium</strong></td>
+                <td>2 points</td>
+                <td>Important but less critical</td>
+                <td>Information gathering, practical considerations</td>
+              </tr>
+              <tr>
+                <td><strong>Low</strong></td>
+                <td>1 point</td>
+                <td>Supportive interactions</td>
+                <td>Administrative tasks, closing remarks</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h4>2. Performance Levels</h4>
+          <p>Levels evaluate the quality of each response:</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Value</th>
+                <th>Description</th>
+                <th>Characteristics</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Good</strong></td>
+                <td>3 points</td>
+                <td>Excellent performance</td>
+                <td>Demonstrates best practices, achieves objectives</td>
+              </tr>
+              <tr>
+                <td><strong>Medium</strong></td>
+                <td>2 points</td>
+                <td>Adequate performance</td>
+                <td>Meets basic requirements, room for improvement</td>
+              </tr>
+              <tr>
+                <td><strong>Low</strong></td>
+                <td>1 point</td>
+                <td>Poor performance</td>
+                <td>Significant gaps, below expected standard</td>
+              </tr>
+              <tr>
+                <td><strong>Bad</strong></td>
+                <td>0 points</td>
+                <td>Incorrect approach</td>
+                <td>Potentially harmful, misses critical opportunities</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="doc-section">
+          <h2>Tag System</h2>
+          
+          <h3>What are Tags?</h3>
+          <p>
+            Tags categorize each response based on the clinical communication skill or topic being addressed. 
+            They help track performance across different aspects of patient interaction.
+          </p>
+          
+          <h3>Tag Categories</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Tag Category</th>
+                <th>Description</th>
+                <th>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Burden - Risk</strong></td>
+                <td>Communicating disease risks and susceptibility</td>
+                <td>Explaining who is at risk, discussing vulnerability factors</td>
+              </tr>
+              <tr>
+                <td><strong>Burden - Symptoms & Complications</strong></td>
+                <td>Describing disease symptoms and potential complications</td>
+                <td>Explaining pain, long-term effects, postherpetic neuralgia</td>
+              </tr>
+              <tr>
+                <td><strong>Burden - Impact on Quality of Life</strong></td>
+                <td>Discussing how disease affects daily living</td>
+                <td>Activity limitations, social impact, emotional burden</td>
+              </tr>
+              <tr>
+                <td><strong>Solution</strong></td>
+                <td>Presenting treatment or prevention options</td>
+                <td>Vaccine introduction, efficacy explanation, scheduling</td>
+              </tr>
+              <tr>
+                <td><strong>Safety</strong></td>
+                <td>Addressing safety concerns and side effects</td>
+                <td>Vaccine safety, contraindications, adverse reactions</td>
+              </tr>
+              <tr>
+                <td><strong>Education</strong></td>
+                <td>Patient education and information sharing</td>
+                <td>Teaching about procedures, setting expectations</td>
+              </tr>
+              <tr>
+                <td><strong>Administration</strong></td>
+                <td>Practical aspects of treatment delivery</td>
+                <td>Vaccine administration, follow-up protocols</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h3>How Tags Work with Scoring</h3>
+          <p>Each response has both a tag and a score. The tag categorizes the communication skill, while the score evaluates performance quality:</p>
+          
+          <div class="example-box">
+            <h4>Example with Tag</h4>
+            <p><strong>Response:</strong> "Long time no see, doctor! I'm okay, I guess."</p>
+            <p><strong>Tag:</strong> Burden - Risk</p>
+            <p><strong>Weight:</strong> High (3)</p>
+            <p><strong>Level:</strong> Good (3)</p>
+            <p><strong>Score:</strong> 3 × 3 = 9 points</p>
+            <p><strong>Interpretation:</strong> Excellent performance in communicating disease risk</p>
+          </div>
+          
+          <h3>Tag Performance Tracking</h3>
+          <p>The Analytics dashboard tracks your performance by tag category, showing:</p>
+          <ul>
+            <li><strong>Usage frequency:</strong> How often each tag appears in your sessions</li>
+            <li><strong>Performance percentage:</strong> Your average score for each tag category</li>
+            <li><strong>Good/Medium/Bad breakdown:</strong> Distribution of response quality per tag</li>
+          </ul>
+          
+          <div class="warning-box">
+            <h4>Using Tag Analytics</h4>
+            <p>Tag performance analysis helps identify specific areas for improvement. For example:</p>
+            <ul>
+              <li>Low scores in "Safety" tags → Practice addressing patient concerns</li>
+              <li>Low scores in "Burden - Risk" tags → Improve risk communication skills</li>
+              <li>High scores in "Solution" tags → Strength in presenting treatment options</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="doc-section">
+          <h2>Score Calculation Process</h2>
+          
+          <h3>Step-by-Step Calculation</h3>
+          
+          <h4>Step 1: Individual Response Evaluation</h4>
+          <p>Each response is scored based on its weight and level:</p>
+          
+          <div class="example-box">
+            <h4>Example: High Weight + Good Level</h4>
+            <p><strong>Response:</strong> "Good morning, Mr. Saad. How are you doing today?"</p>
+            <p><strong>Calculation:</strong> High Weight (3) × Good Level (3) = <strong>9 points</strong></p>
+            <p><strong>Feedback:</strong> "Excellent opening - establishes rapport and shows genuine concern"</p>
+          </div>
+          
+          <h4>Step 2: Session Score Accumulation</h4>
+          <p>All response scores are summed to get the total session score:</p>
+          
+          <div class="formula-box">
+            <div class="formula">Total Score = Σ (All Response Scores)</div>
+            <div class="description">Sum of all individual response scores in the session</div>
+          </div>
+          
+          <h4>Step 3: Maximum Possible Score</h4>
+          <p>The maximum score is calculated assuming all responses were "Good":</p>
+          
+          <div class="formula-box">
+            <div class="formula">Max Score = Σ (Weight × 3) for all responses</div>
+            <div class="description">3 represents the highest level (Good)</div>
+          </div>
+          
+          <h4>Step 4: Final Percentage Calculation</h4>
+          <p>The final score is converted to a percentage:</p>
+          
+          <div class="formula-box">
+            <div class="formula">Final Score % = (Total Score ÷ Max Score) × 100</div>
+            <div class="description">Percentage of maximum possible score achieved</div>
+          </div>
+        </div>
+
+        <div class="doc-section">
+          <h2>Real-World Example</h2>
+          <p>Let's trace through a complete SAAD scenario session:</p>
+          
+          <h3>Session Flow</h3>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Weight</th>
+                <th>Response</th>
+                <th>Level</th>
+                <th>Score</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1. Opening</td>
+                <td>High (3)</td>
+                <td>"Good morning, Mr. Saad. How are you doing today?"</td>
+                <td>Good (3)</td>
+                <td><strong>9</strong></td>
+                <td>Excellent opening - establishes rapport</td>
+              </tr>
+              <tr>
+                <td>2. Empathy</td>
+                <td>High (3)</td>
+                <td>"Acknowledge aging and explain immune weakening"</td>
+                <td>Good (3)</td>
+                <td><strong>9</strong></td>
+                <td>Good empathy - validates feelings</td>
+              </tr>
+              <tr>
+                <td>3. Education</td>
+                <td>High (3)</td>
+                <td>"Explain seriousness and complications"</td>
+                <td>Good (3)</td>
+                <td><strong>9</strong></td>
+                <td>Clear explanation of risks</td>
+              </tr>
+              <tr>
+                <td>4. Practical</td>
+                <td>Medium (2)</td>
+                <td>"Sounds promising. How many visits and side effects?"</td>
+                <td>Good (3)</td>
+                <td><strong>6</strong></td>
+                <td>Practical questions - good engagement</td>
+              </tr>
+              <tr>
+                <td>5. Decision</td>
+                <td>High (3)</td>
+                <td>"I think I need Shingrix."</td>
+                <td>Good (3)</td>
+                <td><strong>9</strong></td>
+                <td>Excellent outcome - patient accepts</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h3>Score Calculation</h3>
+          
+          <div class="example-box">
+            <h4>Calculation Breakdown</h4>
+            <p><strong>Total Points Earned:</strong> 9 + 9 + 9 + 6 + 9 = <strong>42 points</strong></p>
+            <p><strong>Maximum Possible:</strong> 9 + 9 + 9 + 6 + 9 = <strong>42 points</strong></p>
+            <p><strong>Final Score:</strong> (42 ÷ 42) × 100 = <strong>100%</strong></p>
+          </div>
+          
+          <div class="warning-box">
+            <h4>Note</h4>
+            <p>If any response had been "Medium" instead of "Good", the score would be reduced accordingly. 
+            For example, if Step 4 was Medium: 2 × 2 = 4 points instead of 6, resulting in 40/42 = 95%.</p>
+          </div>
+        </div>
+
+        <div class="doc-section">
+          <h2>Score Interpretation</h2>
+          
+          <h3>Performance Categories</h3>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Score Range</th>
+                <th>Performance Level</th>
+                <th>Description</th>
+                <th>Recommendations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>80-100%</strong></td>
+                <td>Outstanding</td>
+                <td>Exceptional clinical communication skills</td>
+                <td>Consider advanced scenarios, mentor others</td>
+              </tr>
+              <tr>
+                <td><strong>60-79%</strong></td>
+                <td>Good</td>
+                <td>Solid performance with effective strategies</td>
+                <td>Focus on consistency, refine techniques</td>
+              </tr>
+              <tr>
+                <td><strong>40-59%</strong></td>
+                <td>Fair</td>
+                <td>Basic competence, needs development</td>
+                <td>Practice fundamentals, seek feedback</td>
+              </tr>
+              <tr>
+                <td><strong>0-39%</strong></td>
+                <td>Needs Work</td>
+                <td>Significant improvement required</td>
+                <td>Return to basics, consider coaching</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h3>Detailed Feedback</h3>
+          <p>Each response includes specific feedback explaining:</p>
+          <ul>
+            <li><strong>Why</strong> the response received that score</li>
+            <li><strong>What</strong> could be improved</li>
+            <li><strong>How</strong> to apply best practices</li>
+            <li><strong>When</strong> to use similar approaches</li>
+          </ul>
+        </div>
+
+        <div class="doc-section">
+          <h2>Technical Implementation</h2>
+          
+          <h3>JavaScript Calculation</h3>
+          <p>The scoring calculation is implemented in JavaScript as follows:</p>
+          
+          <pre><code>function calculateSessionScore(responses, scoringRules) {
+    let totalScore = 0;
+    let maxScore = 0;
+    
+    responses.forEach(response => {
+      const weight = scoringRules.weights[response.score_weight];
+      const level = scoringRules.levels[response.score_level];
+      
+      totalScore += weight * level;
+      maxScore += weight * 3; // Maximum is always "Good"
+    });
+    
+    const percentage = maxScore > 0 ? 
+      Math.round((totalScore / maxScore) * 100) : 0;
+      
+    return {
+      percentage,
+      totalScore,
+      maxScore,
+      breakdown: {
+        good: responses.filter(r => r.score_level === 'Good').length,
+        medium: responses.filter(r => r.score_level === 'Medium').length,
+        bad: responses.filter(r => r.score_level === 'Bad').length
+      }
+    };
+  }</code></pre>
+          
+          <h3>Data Structure</h3>
+          <p>Each response object contains:</p>
+          
+          <pre><code>{
+    "text": "Response text",
+    "next": "next_step_id",
+    "tag": "category-tag",
+    "score_weight": "High|Medium|Low",
+    "score_level": "Good|Medium|Low|Bad",
+    "cta": "call-to-action",
+    "feedback": "Specific feedback message"
+  }</code></pre>
+        </div>
+
+        <div class="doc-section">
+          <h2>Best Practices</h2>
+          
+          <h3>For Scenario Designers</h3>
+          <ul>
+            <li><strong>Balance weights:</strong> Ensure critical moments have higher weights</li>
+            <li><strong>Clear criteria:</strong> Define specific requirements for each level</li>
+            <li><strong>Consistent standards:</strong> Apply scoring criteria uniformly</li>
+            <li><strong>Meaningful feedback:</strong> Provide actionable improvement suggestions</li>
+            <li><strong>Regular review:</strong> Update scoring based on user performance</li>
+          </ul>
+          
+          <h3>For Users</h3>
+          <ul>
+            <li><strong>Read feedback:</strong> Review specific feedback for each response</li>
+            <li><strong>Practice consistently:</strong> Regular practice improves scores</li>
+            <li><strong>Focus on patterns:</strong> Identify recurring areas for improvement</li>
+            <li><strong>Apply learning:</strong> Use feedback in future sessions</li>
+            <li><strong>Track progress:</strong> Monitor improvement over time</li>
+          </ul>
+        </div>
+
+        <div class="doc-section">
+          <h2>Frequently Asked Questions</h2>
+          
+          <h3>Q: Why are some responses worth more points than others?</h3>
+          <p>A: Responses are weighted based on their clinical importance. Critical moments like building rapport, addressing safety concerns, or making key decisions have higher weights because they significantly impact patient outcomes.</p>
+          
+          <h3>Q: Can I get a perfect score?</h3>
+          <p>A: Yes, perfect scores (100%) are achievable by selecting "Good" level responses for all questions. However, the focus should be on learning rather than just achieving high scores.</p>
+          
+          <h3>Q: How is feedback generated?</h3>
+          <p>A: Feedback is pre-written by clinical communication experts for each possible response. It provides specific guidance on why the response was scored that way and how to improve.</p>
+          
+          <h3>Q: Are scores comparable between different scenarios?</h3>
+          <p>A: Yes, the scoring system is standardized across all scenarios. However, different scenarios may have different total points based on their length and complexity.</p>
+          
+          <h3>Q: How can I improve my score?</h3>
+          <p>A: Focus on the feedback provided for each response, practice regularly, and pay attention to patterns in your performance. The analytics dashboard can help track your progress over time.</p>
+        </div>
+
+        <div class="doc-section">
+          <h2>Conclusion</h2>
+          <p>
+            The shing-chat scoring system provides a comprehensive, fair, and educational approach to evaluating clinical communication skills. 
+            By understanding how scores are calculated and what they represent, users can focus their improvement efforts effectively 
+            and develop the communication skills necessary for successful patient interactions.
+          </p>
+          
+          <p>
+            Remember: The goal is not just to achieve high scores, but to internalize the communication principles that lead to 
+            better patient outcomes and more satisfying clinical encounters.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score Modal -->
+  <div class="score-modal" id="score-modal">
+    <div class="score-content">
+      <div class="score-icon">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <h2 class="score-title">Training Complete!</h2>
+      <div class="score-value" id="score-value">0%</div>
+      <p class="score-message" id="score-message">
+        Great job completing the training session!
+      </p>
+      <div class="score-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="good-count">0</div>
+          <div class="stat-label">Good</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="medium-count">0</div>
+          <div class="stat-label">Medium</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="bad-count">0</div>
+          <div class="stat-label">Bad</div>
+        </div>
+      </div>
+      
+      <div class="insight-section" id="tag-breakdown-section">
+        <div class="insight-title"><i class="fas fa-tags"></i> Performance by Tag</div>
+        <div id="tag-breakdown-list"></div>
+      </div>
+      
+      <div class="score-actions">
+        <button class="btn btn-primary" onclick="retryChat()">
+          <i class="fas fa-redo"></i>
+          Try Again
+        </button>
+        <button class="btn btn-secondary" onclick="closeScoreModal()">
+          <i class="fas fa-check"></i>
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario Editor Modal -->
+  <div class="editor-modal" id="editor-modal">
+    <div class="editor-content">
+      <div class="editor-header">
+        <h3 class="editor-title" id="editor-title">Edit Scenario</h3>
+        <button class="icon-btn" onclick="closeEditorModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="editor-body">
+        <div class="editor-section">
+          <h4 class="editor-section-title">
+            <i class="fas fa-info-circle"></i>
+            Basic Information
+          </h4>
+          <div class="form-group">
+            <label class="form-label">Scenario ID</label>
+            <input type="text" class="form-input" id="scenario-id" placeholder="e.g., doctor">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Scenario Title</label>
+            <input type="text" class="form-input" id="scenario-title" placeholder="e.g., SAAD Scenario">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="scenario-description" placeholder="Brief description of the scenario"></textarea>
+          </div>
+        </div>
+        
+        <div class="editor-section">
+          <h4 class="editor-section-title">
+            <i class="fas fa-calculator"></i>
+            Scoring Rules
+          </h4>
+          <div class="form-group">
+            <label class="form-label">Weights (comma-separated values for High, Medium, Low)</label>
+            <input type="text" class="form-input" id="scenario-weights" placeholder="3,2,1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Levels (comma-separated values for Good, Medium, Low, Bad)</label>
+            <input type="text" class="form-input" id="scenario-levels" placeholder="3,2,1,0">
+          </div>
+        </div>
+        
+        <div class="editor-section">
+          <h4 class="editor-section-title">
+            <i class="fas fa-list-ol"></i>
+            Conversation Steps
+          </h4>
+          <div class="steps-container" id="steps-container">
+            <!-- Steps will be dynamically added here -->
+          </div>
+          <button class="admin-btn" onclick="addNewStep()" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-plus"></i>
+            Add Step
+          </button>
+        </div>
+      </div>
+      <div class="editor-footer">
+        <div class="editor-actions">
+          <button class="btn btn-secondary" onclick="closeEditorModal()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="saveScenario()">
+            <i class="fas fa-save"></i>
+            Save Scenario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toast-icon">
+      <i class="fas fa-check"></i>
+    </div>
+    <div class="toast-message" id="toast-message">Success!</div>
+  </div>
+
+  <script>
+  // Default Scenarios
+  const defaultScenarios = {
+    doctor: {
+      "scenario_title": "Shingrix Vaccine Counseling",
+      "description": "Interactive physician-patient training scenario for counseling on Shingrix vaccine.",
+      "scoring_rules": {
+        "weights": {
+          "High": 3,
+          "Medium": 2,
+          "Low": 1
+        },
+        "levels": {
+          "Good": 3,
+          "Medium": 2,
+          "Low": 1,
+          "Bad": 0
+        }
+      },
+      "steps": [
+        {
+          "id": "greeting",
+          "speaker": "bot",
+          "message": "Good morning, Mr. Saad. How are you doing today?",
+          "responses": [
+            {
+              "text": "Long time no see, doctor! I'm okay, I guess.",
+              "next": "exploration",
+              "tag": "Burden - Risk",
+              "score_weight": "High",
+              "score_level": "Good",
+              "cta": "",
+              "feedback": "Excellent opening - establishes rapport and shows genuine concern"
+            },
+            {
+              "text": "Can you get to the point, doctor? I don't have all day.",
+              "next": "exploration",
+              "tag": "Burden - Risk",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "cta": "",
+              "feedback": "Too abrupt - lacks empathy and proper greeting"
+            }
+          ]
+        },
+        {
+          "id": "exploration",
+          "speaker": "bot",
+          "message": "I wanted to check in on your health and see how you've been managing your lung condition.",
+          "responses": [
+            {
+              "text": "Not great, honestly. I feel my age.",
+              "next": "education",
+              "tag": "Burden - Symptoms & Complications",
+              "score_weight": "High",
+              "score_level": "Medium",
+              "cta": "",
+              "feedback": "Good empathy - validates patient feelings"
+            },
+            {
+              "text": "I'm fine, why ask?",
+              "next": "education",
+              "tag": "Burden - Risk",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "cta": "",
+              "feedback": "Dismissive - doesn't engage with patient concerns"
+            }
+          ]
+        },
+        {
+          "id": "education",
+          "speaker": "bot",
+          "message": "Did you know shingles is a painful rash that can result from the chickenpox virus reactivating? 1 in 3 adults will develop it.",
+          "responses": [
+            {
+              "text": "That sounds bad. Can it affect my daily life?",
+              "next": "solution",
+              "tag": "Burden - Impact on Quality of Life",
+              "score_weight": "High",
+              "score_level": "Good",
+              "cta": "",
+              "feedback": "Excellent engagement - shows understanding of patient concerns"
+            },
+            {
+              "text": "I'll deal with it if it happens.",
+              "next": "solution",
+              "tag": "Burden - Symptoms",
+              "score_weight": "High",
+              "score_level": "Medium",
+              "cta": "",
+              "feedback": "Underestimates severity - needs more education"
+            }
+          ]
+        },
+        {
+          "id": "solution",
+          "speaker": "bot",
+          "message": "There's a vaccine called Shingrix — a 2-dose vaccine that's more than 90% effective for people over 50.",
+          "responses": [
+            {
+              "text": "How do you intend to protect me with that?",
+              "next": "objection",
+              "tag": "Solution",
+              "score_weight": "High",
+              "score_level": "Medium",
+              "cta": "",
+              "feedback": "Shows interest but needs more information"
+            },
+            {
+              "text": "I'm too old for vaccines.",
+              "next": "objection",
+              "tag": "Solution",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "cta": "",
+              "feedback": "Ageism concern - needs reassurance about vaccine benefits"
+            }
+          ]
+        },
+        {
+          "id": "objection",
+          "speaker": "bot",
+          "message": "The Shingrix vaccine is safe, well-tested, and effective even for people over 70. Side effects are usually mild.",
+          "responses": [
+            {
+              "text": "That's reassuring. Maybe it's worth it.",
+              "next": "closing",
+              "tag": "Safety",
+              "score_weight": "Medium",
+              "score_level": "Good",
+              "cta": "",
+              "feedback": "Good - safety concerns addressed effectively"
+            },
+            {
+              "text": "I don't like vaccines.",
+              "next": "closing",
+              "tag": "Safety",
+              "score_weight": "Medium",
+              "score_level": "Bad",
+              "cta": "",
+              "feedback": "Persistent resistance - needs more education"
+            }
+          ]
+        },
+        {
+          "id": "closing",
+          "speaker": "bot",
+          "message": "I'm glad we talked. Shingrix can protect you and help you stay active without worrying about shingles.",
+          "responses": [
+            {
+              "text": "Alright, let's do it.",
+              "next": "end",
+              "tag": "Solution",
+              "score_weight": "High",
+              "score_level": "Good",
+              "cta": "Schedule vaccination",
+              "feedback": "Excellent outcome - patient accepts recommendation"
+            },
+            {
+              "text": "Maybe next time.",
+              "next": "end",
+              "tag": "Solution",
+              "score_weight": "High",
+              "score_level": "Medium",
+              "cta": "",
+              "feedback": "Partial success - patient needs follow-up"
+            }
+          ]
+        },
+        {
+          "id": "end",
+          "speaker": "bot",
+          "message": "Thank you for your time today, Mr. Saad. Take care!",
+          "responses": []
+        }
+      ]
+    },
+    nurse: {
+      "scenario_title": "Nurse Scenario",
+      "description": "Nurse–Patient roleplay scenario for vaccine education and administration.",
+      "scoring_rules": {
+        "weights": {
+          "High": 3,
+          "Medium": 2,
+          "Low": 1
+        },
+        "levels": {
+          "Good": 3,
+          "Medium": 2,
+          "Low": 1,
+          "Bad": 0
+        }
+      },
+      "steps": [
+        {
+          "id": "start",
+          "speaker": "bot",
+          "message": "You are the nurse. The doctor has discussed shingles vaccination with Mr. Saad, who has agreed to proceed. Your role is to provide education and administer the vaccine.",
+          "responses": [
+            {
+              "text": "Hello Mr. Saad, I'm here to give you your shingles vaccine today.",
+              "next": "1",
+              "tag": "Education",
+              "score_weight": "High",
+              "score_level": "Good",
+              "feedback": "Professional introduction - sets clear expectations"
+            },
+            {
+              "text": "Ready for your shot? Roll up your sleeve.",
+              "next": "1",
+              "tag": "Education",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "feedback": "Too casual - lacks professional approach"
+            }
+          ]
+        },
+        {
+          "id": "1",
+          "speaker": "patient",
+          "message": "Hello. Yes, the doctor said it would be a good idea. I'm a bit nervous about vaccines though - my wife had a bad reaction to a flu shot once.",
+          "responses": [
+            {
+              "text": "I understand your concern. This vaccine is very safe, and shingles can be much worse than any side effects.",
+              "next": "2",
+              "tag": "Safety",
+              "score_weight": "High",
+              "score_level": "Good",
+              "feedback": "Excellent empathy - validates concerns while educating"
+            },
+            {
+              "text": "Don't worry, this one is different. You'll be fine.",
+              "next": "2",
+              "tag": "Safety",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "feedback": "Dismissive - doesn't properly address concerns"
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "speaker": "patient",
+          "message": "I suppose you're right. My wife did say the shingles pain was unbearable. What exactly should I expect?",
+          "responses": [
+            {
+              "text": "You'll get a shot in your arm. You might have some soreness for a day or two.",
+              "next": "3",
+              "tag": "Education",
+              "score_weight": "High",
+              "score_level": "Good",
+              "feedback": "Clear, concise information - manages expectations"
+            },
+            {
+              "text": "It's just a shot. Your arm might be sore for a bit.",
+              "next": "3",
+              "tag": "Education",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "feedback": "Too simplistic - lacks proper patient education"
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "speaker": "patient",
+          "message": "That sounds manageable. I'm ready to proceed when you are.",
+          "responses": [
+            {
+              "text": "Great. I'll give you the shot now and we'll watch you for a few minutes.",
+              "next": "end",
+              "tag": "Administration",
+              "score_weight": "High",
+              "score_level": "Good",
+              "feedback": "Proper protocol - includes observation period"
+            },
+            {
+              "text": "Okay, hold still. This will be quick.",
+              "next": "end",
+              "tag": "Administration",
+              "score_weight": "High",
+              "score_level": "Bad",
+              "feedback": "Abrupt - lacks proper communication"
+            }
+          ]
+        },
+        {
+          "id": "end",
+          "speaker": "bot",
+          "message": "Vaccine administered successfully. You provided comprehensive patient education and followed proper protocols.",
+          "responses": []
+        }
+      ]
+    }
+  };
+
+  const defaultTagMapping = {
+    "High_Good": {
+      tag: "Burden - Risk",
+      link: "https://www.cdc.gov/shingles/about/risk-factors.html"
+    },
+    "High_Medium": {
+      tag: "Burden - Symptoms",
+      link: "https://www.cdc.gov/shingles/about/symptoms.html"
+    },
+    "High_Low": {
+      tag: "Burden - Awareness Gap",
+      link: "https://www.cdc.gov/shingles/about/overview.html"
+    },
+    "High_Bad": {
+      tag: "Burden - Resistance",
+      link: "https://www.cdc.gov/vaccinesafety/concerns/adjuvants.html"
+    },
+    "Medium_Good": {
+      tag: "Education - Engagement",
+      link: "https://www.cdc.gov/shingles/about/vaccination.html"
+    },
+    "Medium_Medium": {
+      tag: "Education - Needs Support",
+      link: "https://www.cdc.gov/vaccines/hcp/conversations/conv-materials.html"
+    },
+    "Medium_Low": {
+      tag: "Education - Clarify Benefits",
+      link: "https://www.cdc.gov/vaccines/adults/rec-vac/adult-qa.html"
+    },
+    "Medium_Bad": {
+      tag: "Education - Correct Misinformation",
+      link: "https://www.cdc.gov/vaccinesafety/concerns/index.html"
+    },
+    "Low_Good": {
+      tag: "Adherence - Ready to Act",
+      link: "https://www.cdc.gov/vaccines/schedules/hcp/imz/adult.html"
+    },
+    "Low_Medium": {
+      tag: "Adherence - Follow Up",
+      link: "https://www.cdc.gov/vaccines/adults/rec-vac/index.html"
+    },
+    "Low_Low": {
+      tag: "Adherence - Motivation Needed",
+      link: "https://www.cdc.gov/vaccines/adults/index.html"
+    },
+    "Low_Bad": {
+      tag: "Adherence - High Risk Decline",
+      link: "https://www.cdc.gov/vaccinesafety/concerns/index.html"
+    }
+  };
+
+  // Global Variables
+  let scenarios = {};
+  let currentScenario = null;
+  let currentStep = null;
+  let selectedRole = null;
+  let scoreData = { 
+    total: 0, 
+    good: 0, 
+    medium: 0, 
+    bad: 0,
+    maxPossibleScore: 0,
+    selectedResponses: []
+  };
+  let isChatting = false;
+  let startTime = null;
+  let typingTimeout = null;
+  let currentEditingScenario = null;
+  let stepCounter = 0;
+  let currentChartType = 'score';
+
+  function ensureScoringDefaults(scoringRules = {}) {
+    const weights = {
+      High: 3,
+      Medium: 2,
+      Low: 1,
+      ...(scoringRules.weights || {})
+    };
+    const levels = {
+      Good: 3,
+      Medium: 2,
+      Low: 1,
+      Bad: 0,
+      ...(scoringRules.levels || {})
+    };
+    const tagMapping = {
+      ...defaultTagMapping,
+      ...(scoringRules.tag_mapping || {})
+    };
+
+    return {
+      weights,
+      levels,
+      tag_mapping: tagMapping
+    };
+  }
+
+  // Initialize app
+  document.addEventListener('DOMContentLoaded', () => {
+    loadScenarios();
+    loadSavedProgress();
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('score-modal').classList.contains('active')) {
+        closeScoreModal();
+      }
+      if (e.key === 'Escape' && document.getElementById('editor-modal').classList.contains('active')) {
+        closeEditorModal();
+      }
+    });
+  });
+
+  // Scenario Management Functions
+  function loadScenarios() {
+    // Try to load scenarios from localStorage
+    const savedScenarios = localStorage.getItem('shingChatScenarios');
+    let loadedFromStorage = false;
+    if (savedScenarios) {
+      try {
+        scenarios = JSON.parse(savedScenarios);
+        loadedFromStorage = true;
+      } catch (e) {
+        console.error('Failed to load scenarios from localStorage:', e);
+        // Fall back to default scenarios
+        scenarios = JSON.parse(JSON.stringify(defaultScenarios));
+      }
+    } else {
+      // Use default scenarios
+      scenarios = JSON.parse(JSON.stringify(defaultScenarios));
+    }
+
+    // Ensure scoring configuration includes defaults and tag mapping
+    Object.keys(scenarios).forEach(key => {
+      const scenario = scenarios[key] || {};
+      scenario.scoring_rules = ensureScoringDefaults(scenario.scoring_rules || {});
+      scenarios[key] = scenario;
+    });
+
+    // Save defaults to localStorage if we had to bootstrap them
+    if (!loadedFromStorage) {
+      saveScenarios();
+    }
+    
+    // Load scenarios in welcome screen
+    loadScenariosInWelcome();
+    
+    // Load scenarios in admin dashboard
+    loadScenariosInAdmin();
+    
+    // Update scenario filter in analytics
+    updateScenarioFilter();
+  }
+
+  function saveScenarios() {
+    localStorage.setItem('shingChatScenarios', JSON.stringify(scenarios));
+  }
+
+  function loadScenariosInWelcome() {
+    const container = document.getElementById('scenario-selector');
+    container.innerHTML = '';
+    
+    Object.keys(scenarios).forEach(key => {
+      const scenario = scenarios[key];
+      const card = document.createElement('div');
+      card.className = 'scenario-card';
+      card.id = `${key}-card`;
+      card.onclick = () => selectScenario(key);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Select ${scenario.scenario_title}`);
+      
+      // Determine icon based on scenario
+      let icon = '🏥';
+      if (key === 'doctor') icon = '👨‍⚕️';
+      else if (key === 'nurse') icon = '👩‍⚕️';
+      
+      card.innerHTML = `
+        <div class="scenario-icon">${icon}</div>
+        <div class="scenario-title">${scenario.scenario_title}</div>
+        <div class="scenario-desc">${scenario.description}</div>
+      `;
+      
+      container.appendChild(card);
+    });
+  }
+
+  function loadScenariosInAdmin() {
+    const container = document.getElementById('scenarios-list');
+    container.innerHTML = '';
+    
+    Object.keys(scenarios).forEach(key => {
+      const scenario = scenarios[key];
+      const scenarioElement = document.createElement('div');
+      scenarioElement.className = 'scenario-item';
+      
+      const stepsCount = scenario.steps ? scenario.steps.length : 0;
+      
+      scenarioElement.innerHTML = `
+        <div class="scenario-item-header">
+          <h3 class="scenario-item-title">${scenario.scenario_title}</h3>
+          <div class="scenario-item-actions">
+            <button class="icon-btn" onclick="editScenario('${key}')" aria-label="Edit scenario">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="icon-btn delete" onclick="deleteScenario('${key}')" aria-label="Delete scenario">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <p class="scenario-item-description">${scenario.description}</p>
+        <div class="scenario-stats">
+          <div class="scenario-stat">
+            <i class="fas fa-list-ol"></i>
+            <span>${stepsCount} steps</span>
+          </div>
+          <div class="scenario-stat">
+            <i class="fas fa-key"></i>
+            <span>ID: ${key}</span>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(scenarioElement);
+    });
+  }
+
+  function selectScenario(role) {
+    // Check if scenario exists
+    if (!scenarios[role]) {
+      showToast('Scenario not found!', 'error');
+      return;
+    }
+    
+    // Update UI
+    document.querySelectorAll('.scenario-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    document.getElementById(`${role}-card`).classList.add('selected');
+    
+    selectedRole = role;
+    currentScenario = scenarios[role];
+    currentScenario.scoring_rules = ensureScoringDefaults(currentScenario.scoring_rules || {});
+    scenarios[role] = currentScenario;
+    
+    // Calculate max possible score
+    calculateMaxPossibleScore();
+    
+    // Enable start button
+    const startBtn = document.getElementById('start-btn');
+    startBtn.disabled = false;
+    startBtn.innerHTML = `
+      Start ${currentScenario.scenario_title}
+      <i class="fas fa-arrow-right"></i>
+    `;
+    
+    saveProgress();
+  }
+
+  function calculateMaxPossibleScore() {
+    let maxScore = 0;
+    
+    currentScenario.steps.forEach(step => {
+      if (step.responses && step.responses.length > 0) {
+        let stepMaxScore = 0;
+        step.responses.forEach(response => {
+          const weight = currentScenario.scoring_rules.weights[response.score_weight];
+          const level = currentScenario.scoring_rules.levels['Good']; // Maximum is always Good
+          stepMaxScore = Math.max(stepMaxScore, weight * level);
+        });
+        maxScore += stepMaxScore;
+      }
+    });
+    
+    scoreData.maxPossibleScore = maxScore;
+  }
+
+  // Tab Navigation
+  function switchTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    
+    // Load content based on tab
+    if (tabName === 'admin') {
+      loadScenariosInAdmin();
+    } else if (tabName === 'analytics') {
+      updateAnalytics();
+    }
+  }
+
+  // Chat Functions
+  function startChat() {
+    if (!selectedRole || !currentScenario) return;
+    
+    isChatting = true;
+    currentStep = currentScenario.steps[0];
+    scoreData = { 
+      total: 0, 
+      good: 0, 
+      medium: 0, 
+      bad: 0,
+      maxPossibleScore: scoreData.maxPossibleScore,
+      selectedResponses: []
+    };
+    startTime = new Date();
+    
+    // Hide welcome screen
+    document.getElementById('welcome-screen').style.display = 'none';
+    
+    // Start conversation
+    showMessage(currentStep);
+  }
+
+  function showMessage(step) {
+    const messagesArea = document.getElementById('messages-area');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const typingStatus = document.getElementById('typing-status');
+    
+    // Clear any existing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    
+    // Calculate typing time based on message length
+    const baseTypingTime = 1000;
+    const charTypingTime = 30;
+    const typingTime = Math.min(baseTypingTime + (step.message.length * charTypingTime), 3000);
+    
+    // Show typing indicator with status
+    typingStatus.textContent = 'Typing...';
+    typingIndicator.classList.add('active');
+    
+    // Scroll to bottom to show typing indicator
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+    
+    typingTimeout = setTimeout(() => {
+      // Change status to "Sending..." before showing message
+      typingStatus.textContent = 'Sending...';
+      
+      setTimeout(() => {
+        // Hide typing indicator
+        typingIndicator.classList.remove('active');
+        
+        // Create message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${step.speaker}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = `message-avatar ${step.speaker}-message-avatar`;
+        if (step.speaker === 'bot') {
+          avatar.innerHTML = '<i class="fas fa-shield-virus"></i>';
+        } else if (step.speaker === 'patient') {
+          avatar.innerHTML = '<i class="fas fa-user"></i>';
+        }
+        messageDiv.appendChild(avatar);
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        
+        const text = document.createElement('div');
+        text.className = 'message-text';
+        text.textContent = step.message;
+        bubble.appendChild(text);
+        
+        const time = document.createElement('div');
+        time.className = 'message-time';
+        time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        bubble.appendChild(time);
+        
+        content.appendChild(bubble);
+        messageDiv.appendChild(content);
+        
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        
+        // Show responses or end
+        if (step.responses && step.responses.length > 0) {
+          showResponses(step.responses);
+        } else {
+          setTimeout(() => showScore(), 2000);
+        }
+      }, 300);
+    }, typingTime);
+  }
+
+  function showResponses(responses) {
+    const container = document.getElementById('response-options');
+    container.innerHTML = '';
+    
+    responses.forEach((response, index) => {
+      setTimeout(() => {
+        const button = document.createElement('button');
+        button.className = 'response-btn';
+        button.textContent = response.text;
+        button.onclick = () => selectResponse(response);
+        button.setAttribute('aria-label', `Select: ${response.text}`);
+        container.appendChild(button);
+      }, index * 100);
+    });
+  }
+
+  function selectResponse(response) {
+    // Derive contextual tag based on score weight and level
+    const tagKey = `${response.score_weight}_${response.score_level}`;
+    const tagInfo = (currentScenario.scoring_rules && currentScenario.scoring_rules.tag_mapping && currentScenario.scoring_rules.tag_mapping[tagKey]) ||
+      defaultTagMapping[tagKey] ||
+      {
+        tag: "General Insight",
+        link: "#"
+      };
+    const assignedTag = { ...tagInfo };
+
+    // Add user message
+    const messagesArea = document.getElementById('messages-area');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message user';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar user-message-avatar';
+    avatar.innerHTML = '<i class="fas fa-user"></i>';
+    messageDiv.appendChild(avatar);
+    
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    
+    const text = document.createElement('div');
+    text.className = 'message-text';
+    text.textContent = response.text;
+    bubble.appendChild(text);
+
+    // Add tag with link if available
+    if (assignedTag.tag) {
+      const tagLink = document.createElement('a');
+      tagLink.href = assignedTag.link || '#';
+      tagLink.className = 'response-tag';
+      tagLink.textContent = assignedTag.tag;
+      tagLink.target = '_blank';
+      tagLink.rel = 'noopener noreferrer';
+      bubble.appendChild(tagLink);
+    }
+    
+    const time = document.createElement('div');
+    time.className = 'message-time';
+    time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    bubble.appendChild(time);
+    
+    content.appendChild(bubble);
+    messageDiv.appendChild(content);
+    
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+    
+    // Update score
+    scoreData.total++;
+    const { feedback, tag, ...responseWithoutMeta } = response;
+    const recordedResponse = {
+      ...responseWithoutMeta,
+      assignedTag
+    };
+    scoreData.selectedResponses.push(recordedResponse);
+
+    if (recordedResponse.score_level === 'Good') scoreData.good++;
+    else if (recordedResponse.score_level === 'Medium') scoreData.medium++;
+    else if (recordedResponse.score_level === 'Bad') scoreData.bad++;
+    
+    // Clear responses
+    document.getElementById('response-options').innerHTML = '';
+    
+    // Next step
+    const nextStep = currentScenario.steps.find(s => s.id === response.next);
+    if (nextStep) {
+      currentStep = nextStep;
+      setTimeout(() => showMessage(nextStep), 800);
+    }
+  }
+
+  function showScore() {
+    // Calculate completion time
+    const endTime = new Date();
+    const completionTime = Math.round((endTime - startTime) / 1000);
+    
+    // Calculate score using the formula: Total_Score = Σ(weight_value × level_value) / Number_of_questions
+    let totalScore = 0;
+    scoreData.selectedResponses.forEach(response => {
+      const weight = currentScenario.scoring_rules.weights[response.score_weight];
+      const level = currentScenario.scoring_rules.levels[response.score_level];
+      totalScore += weight * level;
+    });
+    
+    // Calculate percentage
+    const percentage = scoreData.maxPossibleScore > 0 ? 
+      Math.round((totalScore / scoreData.maxPossibleScore) * 100) : 0;
+    
+    // Update score display
+    document.getElementById('score-value').textContent = percentage + '%';
+    document.getElementById('good-count').textContent = scoreData.good;
+    document.getElementById('medium-count').textContent = scoreData.medium;
+    document.getElementById('bad-count').textContent = scoreData.bad;
+    
+    // Update message
+    let message = '';
+    if (percentage >= 80) {
+      message = "Outstanding performance! You demonstrated exceptional clinical communication skills and patient-centered care.";
+    } else if (percentage >= 60) {
+      message = "Great job! You handled the consultation well with effective communication strategies.";
+    } else if (percentage >= 40) {
+      message = "Good effort! Focus on building rapport and providing more detailed explanations.";
+    } else {
+      message = "Keep practicing! Review communication best practices to enhance your skills.";
+    }
+    document.getElementById('score-message').textContent = message;
+    
+    // Save to history with assigned tags
+    saveToHistory(percentage, completionTime);
+    
+    // Show modal
+    document.getElementById('score-modal').classList.add('active');
+  }
+
+  function generateFeedback() {
+    const feedbackList = document.getElementById('feedback-list');
+    feedbackList.innerHTML = '';
+    
+    // Get top 3 feedback items
+    const feedbackItems = scoreData.selectedResponses
+      .filter(r => r.feedback)
+      .slice(-3);
+    
+    feedbackItems.forEach(item => {
+      const feedbackDiv = document.createElement('div');
+      feedbackDiv.className = 'feedback-item';
+      
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-check-circle feedback-icon';
+      
+      const text = document.createElement('span');
+      text.textContent = item.feedback;
+      
+      feedbackDiv.appendChild(icon);
+      feedbackDiv.appendChild(text);
+      feedbackList.appendChild(feedbackDiv);
+    });
+    
+    if (feedbackItems.length === 0) {
+      feedbackList.innerHTML = '<div class="feedback-item">No specific feedback available for this session.</div>';
+    }
+    
+    // Generate tag breakdown
+    const tagBreakdownList = document.getElementById('tag-breakdown-list');
+    tagBreakdownList.innerHTML = '';
+    
+    // Collect tag data from current session
+    const sessionTags = {};
+    scoreData.selectedResponses.forEach(response => {
+      if (response.tag) {
+        if (!sessionTags[response.tag]) {
+          sessionTags[response.tag] = {
+            count: 0,
+            totalScore: 0,
+            maxScore: 0,
+            good: 0,
+            medium: 0,
+            bad: 0
+          };
+        }
+        sessionTags[response.tag].count++;
+        
+        const weight = currentScenario.scoring_rules.weights[response.score_weight];
+        const level = currentScenario.scoring_rules.levels[response.score_level];
+        const maxLevel = currentScenario.scoring_rules.levels['Good'];
+        
+        sessionTags[response.tag].totalScore += weight * level;
+        sessionTags[response.tag].maxScore += weight * maxLevel;
+        
+        if (response.score_level === 'Good') sessionTags[response.tag].good++;
+        else if (response.score_level === 'Medium') sessionTags[response.tag].medium++;
+        else if (response.score_level === 'Bad') sessionTags[response.tag].bad++;
+      }
+    });
+    
+    // Display tag breakdown
+    Object.keys(sessionTags).forEach(tagName => {
+      const tagInfo = sessionTags[tagName];
+      const percentage = tagInfo.maxScore > 0 ? 
+        Math.round((tagInfo.totalScore / tagInfo.maxScore) * 100) : 0;
+      
+      const tagDiv = document.createElement('div');
+      tagDiv.className = 'feedback-item';
+      tagDiv.style.cursor = 'pointer';
+      tagDiv.onclick = () => {
+        // Switch to analytics tab and show tags
+        switchTab('analytics');
+        currentChartType = 'tags';
+        updateAnalytics();
+        closeScoreModal();
+      };
+      
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-tag feedback-icon';
+      
+      const text = document.createElement('span');
+      text.innerHTML = `<strong>${tagName}:</strong> ${percentage}% (G:${tagInfo.good} M:${tagInfo.medium} B:${tagInfo.bad}) <i class="fas fa-external-link-alt" style="font-size: 0.7rem; margin-left: 0.25rem;"></i>`;
+      
+      tagDiv.appendChild(icon);
+      tagDiv.appendChild(text);
+      tagBreakdownList.appendChild(tagDiv);
+    });
+    
+    if (Object.keys(sessionTags).length === 0) {
+      tagBreakdownList.innerHTML = '<div class="feedback-item">No tag data available for this session.</div>';
+    }
+  }
+
+  function saveToHistory(score, time) {
+    const history = JSON.parse(localStorage.getItem('shingChatHistory') || '[]');
+    
+    // Collect tag data
+    const tagData = {};
+    scoreData.selectedResponses.forEach(response => {
+      if (response.assignedTag && response.assignedTag.tag) {
+        const tag = response.assignedTag.tag;
+        if (!tagData[tag]) {
+          tagData[tag] = {
+            count: 0,
+            totalScore: 0,
+            good: 0,
+            medium: 0,
+            bad: 0,
+            link: response.assignedTag.link
+          };
+        }
+        tagData[tag].count++;
+        
+        const weight = currentScenario.scoring_rules.weights[response.score_weight];
+        const level = currentScenario.scoring_rules.levels[response.score_level];
+        tagData[tag].totalScore += weight * level;
+        
+        if (response.score_level === 'Good') tagData[tag].good++;
+        else if (response.score_level === 'Medium') tagData[tag].medium++;
+        else if (response.score_level === 'Bad') tagData[tag].bad++;
+      }
+    });
+    
+    history.push({
+      scenario: selectedRole,
+      score: score,
+      time: time,
+      date: new Date().toISOString(),
+      responses: scoreData.selectedResponses.length,
+      good: scoreData.good,
+      medium: scoreData.medium,
+      bad: scoreData.bad,
+      tags: tagData,
+      responseTags: scoreData.selectedResponses.map(r => r.assignedTag ? r.assignedTag.tag : null)
+    });
+    
+    // Keep only last 100 entries
+    if (history.length > 100) {
+      history.splice(0, history.length - 100);
+    }
+    
+    localStorage.setItem('shingChatHistory', JSON.stringify(history));
+  }
+
+  function retryChat() {
+    document.getElementById('score-modal').classList.remove('active');
+    resetChat();
+    startChat();
+  }
+
+  function closeScoreModal() {
+    document.getElementById('score-modal').classList.remove('active');
+    resetChat();
+  }
+
+  function resetChat() {
+    isChatting = false;
+    currentStep = null;
+    
+    // Clear any typing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+      typingTimeout = null;
+    }
+    
+    // Hide typing indicator
+    document.getElementById('typing-indicator').classList.remove('active');
+    
+    // Clear messages
+    const messagesArea = document.getElementById('messages-area');
+    messagesArea.innerHTML = `
+      <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-icon">
+          <i class="fas fa-shield-virus"></i>
+        </div>
+        <h2 class="welcome-title">shing-chat</h2>
+        <p class="welcome-description">
+          Practice your clinical communication skills with AI-powered scenarios
+        </p>
+        
+        <div class="scenario-selector" id="scenario-selector">
+          <!-- Scenarios will be dynamically loaded here -->
+        </div>
+        
+        <button class="start-btn" id="start-btn" onclick="startChat()" disabled>
+          Select a scenario to begin
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="typing-indicator" id="typing-indicator">
+        <div class="bot-message-avatar">
+          <i class="fas fa-shield-virus"></i>
+        </div>
+        <div>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+          <div class="typing-status" id="typing-status">Typing...</div>
+        </div>
+      </div>
+    `;
+    
+    // Reload scenarios in welcome screen
+    loadScenariosInWelcome();
+    
+    // Restore selected scenario if any
+    if (selectedRole) {
+      selectScenario(selectedRole);
+    }
+  }
+
+  function showInfo() {
+    const history = JSON.parse(localStorage.getItem('shingChatHistory') || '[]');
+    const totalSessions = history.length;
+    const avgScore = totalSessions > 0 ? 
+      Math.round(history.reduce((sum, h) => sum + h.score, 0) / totalSessions) : 0;
+    
+    alert(`shing-chat v1.0\n\nPractice your clinical communication skills in a safe, AI-powered environment.\n\nFeatures:\n• Realistic patient scenarios\n• Instant feedback on your responses\n• Performance scoring\n• Multiple healthcare roles\n• Admin dashboard for scenario management\n• Analytics dashboard for performance tracking\n• Comprehensive scoring documentation\n\nYour Stats:\n• Total Sessions: ${totalSessions}\n• Average Score: ${avgScore}%\n\nPress ESC to close any modal.`);
+  }
+
+  // Admin Functions
+  function openNewScenarioModal() {
+    currentEditingScenario = null;
+    stepCounter = 0;
+    
+    // Reset form
+    document.getElementById('scenario-id').value = '';
+    document.getElementById('scenario-title').value = '';
+    document.getElementById('scenario-description').value = '';
+    document.getElementById('scenario-weights').value = '3,2,1';
+    document.getElementById('scenario-levels').value = '3,2,1,0';
+    
+    // Clear steps container
+    document.getElementById('steps-container').innerHTML = '';
+    
+    // Add initial step
+    addNewStep();
+    
+    // Update modal title
+    document.getElementById('editor-title').textContent = 'Create New Scenario';
+    
+    // Show modal
+    document.getElementById('editor-modal').classList.add('active');
+  }
+
+  function editScenario(scenarioId) {
+    currentEditingScenario = scenarioId;
+    const scenario = scenarios[scenarioId];
+    
+    // Populate form
+    document.getElementById('scenario-id').value = scenarioId;
+    document.getElementById('scenario-title').value = scenario.scenario_title;
+    document.getElementById('scenario-description').value = scenario.description;
+    
+    // Populate scoring rules
+    const weights = scenario.scoring_rules.weights;
+    const levels = scenario.scoring_rules.levels;
+    
+    document.getElementById('scenario-weights').value = `${weights.High},${weights.Medium},${weights.Low}`;
+    document.getElementById('scenario-levels').value = `${levels.Good},${levels.Medium},${levels.Low},${levels.Bad}`;
+    
+    // Clear and populate steps
+    document.getElementById('steps-container').innerHTML = '';
+    stepCounter = 0;
+    
+    if (scenario.steps) {
+      scenario.steps.forEach(step => {
+        addStepToEditor(step);
+      });
+    }
+    
+    // Update modal title
+    document.getElementById('editor-title').textContent = 'Edit Scenario';
+    
+    // Show modal
+    document.getElementById('editor-modal').classList.add('active');
+  }
+
+  function addStepToEditor(stepData) {
+    const stepId = stepData.id || `step_${stepCounter++}`;
+    const container = document.getElementById('steps-container');
+    
+    const stepElement = document.createElement('div');
+    stepElement.className = 'step-item';
+    stepElement.id = `step-${stepId}`;
+    
+    const speakerOptions = ['bot', 'patient'];
+    const speakerOptionsHtml = speakerOptions.map(speaker => 
+      `<option value="${speaker}" ${stepData.speaker === speaker ? 'selected' : ''}>${speaker}</option>`
+    ).join('');
+    
+    stepElement.innerHTML = `
+      <div class="step-header">
+        <div class="step-title">
+          <span class="step-id">${stepId}</span>
+          <span>Step</span>
+        </div>
+        <div class="step-actions">
+          <button class="icon-btn" onclick="addResponseToStep('${stepId}')" aria-label="Add response">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button class="icon-btn delete" onclick="removeStep('${stepId}')" aria-label="Remove step">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Speaker</label>
+        <select class="form-select" id="speaker-${stepId}">
+          ${speakerOptionsHtml}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" id="message-${stepId}">${stepData.message || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Responses</label>
+        <div class="responses-container" id="responses-${stepId}">
+          ${stepData.responses ? stepData.responses.map((response, index) => 
+            createResponseHtml(stepId, index, response)
+          ).join('') : ''}
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(stepElement);
+  }
+
+  function addNewStep() {
+    const stepData = {
+      id: `step_${stepCounter++}`,
+      speaker: 'bot',
+      message: '',
+      responses: []
+    };
+    
+    addStepToEditor(stepData);
+  }
+
+  function removeStep(stepId) {
+    const stepElement = document.getElementById(`step-${stepId}`);
+    if (stepElement) {
+      stepElement.remove();
+    }
+  }
+
+  function createResponseHtml(stepId, responseIndex, responseData) {
+    const responseId = responseData.id || `${stepId}_response_${responseIndex}`;
+    
+    const weightOptions = ['High', 'Medium', 'Low'];
+    const levelOptions = ['Good', 'Medium', 'Low', 'Bad'];
+    
+    const weightOptionsHtml = weightOptions.map(weight => 
+      `<option value="${weight}" ${responseData.score_weight === weight ? 'selected' : ''}>${weight}</option>`
+    ).join('');
+    
+    const levelOptionsHtml = levelOptions.map(level => 
+      `<option value="${level}" ${responseData.score_level === level ? 'selected' : ''}>${level}</option>`
+    ).join('');
+    
+    return `
+      <div class="response-item" id="${responseId}">
+        <div class="response-header">
+          <span>Response ${responseIndex + 1}</span>
+          <button class="icon-btn delete" onclick="removeResponse('${responseId}')" aria-label="Remove response">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Text</label>
+          <input type="text" class="form-input" id="text-${responseId}" value="${responseData.text || ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Next Step ID</label>
+          <input type="text" class="form-input" id="next-${responseId}" value="${responseData.next || ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tag</label>
+          <input type="text" class="form-input" id="tag-${responseId}" value="${responseData.tag || ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Score Weight</label>
+          <select class="form-select" id="weight-${responseId}">
+            ${weightOptionsHtml}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Score Level</label>
+          <select class="form-select" id="level-${responseId}">
+            ${levelOptionsHtml}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CTA</label>
+          <input type="text" class="form-input" id="cta-${responseId}" value="${responseData.cta || ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Feedback</label>
+          <textarea class="form-textarea" id="feedback-${responseId}">${responseData.feedback || ''}</textarea>
+        </div>
+      </div>
+    `;
+  }
+
+  function addResponseToStep(stepId) {
+    const responsesContainer = document.getElementById(`responses-${stepId}`);
+    const responseCount = responsesContainer.children.length;
+    
+    const responseData = {
+      id: `${stepId}_response_${responseCount}`,
+      text: '',
+      next: '',
+      tag: '',
+      score_weight: 'Medium',
+      score_level: 'Medium',
+      cta: '',
+      feedback: ''
+    };
+    
+    const responseHtml = createResponseHtml(stepId, responseCount, responseData);
+    responsesContainer.insertAdjacentHTML('beforeend', responseHtml);
+  }
+
+  function removeResponse(responseId) {
+    const responseElement = document.getElementById(responseId);
+    if (responseElement) {
+      responseElement.remove();
+    }
+  }
+
+  function closeEditorModal() {
+    document.getElementById('editor-modal').classList.remove('active');
+  }
+
+  function saveScenario() {
+    // Collect form data
+    const scenarioId = document.getElementById('scenario-id').value;
+    const scenarioTitle = document.getElementById('scenario-title').value;
+    const scenarioDescription = document.getElementById('scenario-description').value;
+    
+    if (!scenarioId || !scenarioTitle) {
+      showToast('Please provide at least an ID and title for the scenario.', 'error');
+      return;
+    }
+    
+    // Parse scoring rules
+    const weightsValues = document.getElementById('scenario-weights').value.split(',').map(v => parseInt(v.trim()));
+    const levelsValues = document.getElementById('scenario-levels').value.split(',').map(v => parseInt(v.trim()));
+    
+    const scoringRules = {
+      weights: {
+        High: weightsValues[0] || 3,
+        Medium: weightsValues[1] || 2,
+        Low: weightsValues[2] || 1
+      },
+      levels: {
+        Good: levelsValues[0] || 3,
+        Medium: levelsValues[1] || 2,
+        Low: levelsValues[2] || 1,
+        Bad: levelsValues[3] || 0
+      }
+    };
+    
+    // Collect steps
+    const steps = [];
+    const stepElements = document.querySelectorAll('.step-item');
+    
+    stepElements.forEach(stepElement => {
+      const stepId = stepElement.id.replace('step-', '');
+      const speaker = document.getElementById(`speaker-${stepId}`).value;
+      const message = document.getElementById(`message-${stepId}`).value;
+      
+      const responses = [];
+      const responseElements = stepElement.querySelectorAll('.response-item');
+      
+      responseElements.forEach(responseElement => {
+        const responseId = responseElement.id;
+        const text = document.getElementById(`text-${responseId}`).value;
+        const next = document.getElementById(`next-${responseId}`).value;
+        const scoreWeight = document.getElementById(`weight-${responseId}`).value;
+        const scoreLevel = document.getElementById(`level-${responseId}`).value;
+        const cta = document.getElementById(`cta-${responseId}`).value;
+        
+        responses.push({
+          text,
+          next,
+          score_weight: scoreWeight,
+          score_level: scoreLevel,
+          cta
+        });
+      });
+      
+      steps.push({
+        id: stepId,
+        speaker,
+        message,
+        responses
+      });
+    });
+    
+    // Create scenario object
+    const scenario = {
+      scenario_title: scenarioTitle,
+      description: scenarioDescription,
+      scoring_rules: ensureScoringDefaults(scoringRules),
+      steps
+    };
+    
+    // Save to scenarios object
+    scenarios[scenarioId] = scenario;
+    
+    // Save to localStorage
+    saveScenarios();
+    
+    // Close modal
+    closeEditorModal();
+    
+    // Refresh admin list
+    loadScenariosInAdmin();
+    
+    // Refresh welcome screen
+    loadScenariosInWelcome();
+    
+    // Update scenario filter
+    updateScenarioFilter();
+    
+    // If this was the selected scenario, reload it
+    if (selectedRole === scenarioId) {
+      selectScenario(scenarioId);
+    }
+    
+    // Show success message
+    showToast(`Scenario "${scenarioTitle}" has been saved successfully!`, 'success');
+  }
+
+  function deleteScenario(scenarioId) {
+    if (confirm(`Are you sure you want to delete the scenario "${scenarios[scenarioId].scenario_title}"?`)) {
+      delete scenarios[scenarioId];
+      saveScenarios();
+      loadScenariosInAdmin();
+      loadScenariosInWelcome();
+      updateScenarioFilter();
+      
+      // If this was the selected scenario, reset selection
+      if (selectedRole === scenarioId) {
+        selectedRole = null;
+        document.getElementById('start-btn').disabled = true;
+        document.getElementById('start-btn').innerHTML = `
+          Select a scenario to begin
+          <i class="fas fa-arrow-right"></i>
+        `;
+      }
+      
+      showToast('Scenario deleted successfully!', 'success');
+    }
+  }
+
+  // Analytics Functions
+  function updateScenarioFilter() {
+    const filterSelect = document.getElementById('scenario-filter');
+    filterSelect.innerHTML = '<option value="all">All Scenarios</option>';
+    
+    Object.keys(scenarios).forEach(key => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = scenarios[key].scenario_title;
+      filterSelect.appendChild(option);
+    });
+  }
+
+  function updateAnalytics() {
+    const timeFilter = document.getElementById('time-filter').value;
+    const scenarioFilter = document.getElementById('scenario-filter').value;
+    
+    // Get filtered history
+    const history = JSON.parse(localStorage.getItem('shingChatHistory') || '[]');
+    const now = new Date();
+    let filteredHistory = history.filter(session => {
+      const sessionDate = new Date(session.date);
+      const daysDiff = (now - sessionDate) / (1000 * 60 * 60 * 24);
+      
+      // Time filter
+      if (timeFilter !== 'all' && daysDiff > parseInt(timeFilter)) {
+        return false;
+      }
+      
+      // Scenario filter
+      if (scenarioFilter !== 'all' && session.scenario !== scenarioFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    // Update stats
+    updateStats(filteredHistory);
+    
+    // Update chart
+    updateChart(filteredHistory);
+    
+    // Update table
+    updateSessionsTable(filteredHistory);
+  }
+
+  function updateStats(history) {
+    // Total sessions
+    document.getElementById('total-sessions').textContent = history.length;
+    
+    // Average score
+    const avgScore = history.length > 0 ? 
+      Math.round(history.reduce((sum, h) => sum + h.score, 0) / history.length) : 0;
+    document.getElementById('avg-score').textContent = avgScore + '%';
+    
+    // Average duration
+    const avgDuration = history.length > 0 ? 
+      Math.round(history.reduce((sum, h) => sum + h.time, 0) / history.length) : 0;
+    document.getElementById('avg-duration').textContent = formatDuration(avgDuration);
+    
+    // Completion rate (sessions with more than 5 responses)
+    const completedSessions = history.filter(h => h.responses >= 5).length;
+    const completionRate = history.length > 0 ? 
+      Math.round((completedSessions / history.length) * 100) : 0;
+    document.getElementById('completion-rate').textContent = completionRate + '%';
+    
+    // Update change indicators (mock data for demo)
+    document.getElementById('sessions-change').textContent = '+12% from last period';
+    document.getElementById('score-change').textContent = '+5% from last period';
+    document.getElementById('duration-change').textContent = '-8% from last period';
+    document.getElementById('completion-change').textContent = '+3% from last period';
+  }
+
+  function updateChart(history) {
+    const chartCanvas = document.getElementById('chart-canvas');
+    chartCanvas.innerHTML = '';
+    
+    if (history.length === 0) {
+      chartCanvas.innerHTML = '<div style="text-align: center; color: var(--gray-500); padding: 2rem;">No data available</div>';
+      return;
+    }
+    
+    if (currentChartType === 'tags') {
+      // Show tag distribution
+      updateTagPerformance(history);
+      chartCanvas.innerHTML = '<div style="text-align: center; color: var(--gray-600); padding: 2rem;">Tag analysis shown below</div>';
+      return;
+    }
+    
+    // Group data by date
+    const groupedData = {};
+    history.forEach(session => {
+      const date = new Date(session.date).toLocaleDateString();
+      if (!groupedData[date]) {
+        groupedData[date] = {
+          scores: [],
+          times: [],
+          count: 0
+        };
+      }
+      groupedData[date].scores.push(session.score);
+      groupedData[date].times.push(session.time);
+      groupedData[date].count++;
+    });
+    
+    // Get last 7 dates
+    const dates = Object.keys(groupedData).slice(-7);
+    const maxCount = Math.max(...dates.map(d => groupedData[d].count));
+    
+    // Create bars
+    dates.forEach(date => {
+      const data = groupedData[date];
+      const value = currentChartType === 'score' ? 
+        Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length) :
+        Math.round(data.times.reduce((a, b) => a + b, 0) / data.times.length);
+      
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar';
+      bar.style.height = `${(data.count / maxCount) * 100}%`;
+      
+      const label = document.createElement('div');
+      label.className = 'chart-bar-label';
+      label.textContent = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      
+      const valueLabel = document.createElement('div');
+      valueLabel.className = 'chart-bar-value';
+      valueLabel.textContent = currentChartType === 'score' ? `${value}%` : formatDuration(value);
+      
+      bar.appendChild(label);
+      bar.appendChild(valueLabel);
+      chartCanvas.appendChild(bar);
+    });
+  }
+
+  function updateTagPerformance(history) {
+    const container = document.getElementById('tag-performance-chart');
+    container.innerHTML = '';
+    
+    if (history.length === 0) {
+      container.innerHTML = '<div style="text-align: center; color: var(--gray-500); padding: 2rem;">No tag data available</div>';
+      return;
+    }
+    
+    // Aggregate tag data across all sessions
+    const aggregatedTags = {};
+    history.forEach(session => {
+      if (session.tags) {
+        Object.keys(session.tags).forEach(tagName => {
+          if (!aggregatedTags[tagName]) {
+            aggregatedTags[tagName] = {
+              count: 0,
+              totalScore: 0,
+              maxScore: 0,
+              good: 0,
+              medium: 0,
+              bad: 0
+            };
+          }
+          const tagInfo = session.tags[tagName];
+          aggregatedTags[tagName].count += tagInfo.count;
+          aggregatedTags[tagName].totalScore += tagInfo.totalScore;
+          aggregatedTags[tagName].maxScore += tagInfo.count * 9; // Max is High (3) × Good (3)
+          aggregatedTags[tagName].good += tagInfo.good;
+          aggregatedTags[tagName].medium += tagInfo.medium;
+          aggregatedTags[tagName].bad += tagInfo.bad;
+        });
+      }
+    });
+    
+    // Sort tags by count (most used first)
+    const sortedTags = Object.keys(aggregatedTags).sort((a, b) => 
+      aggregatedTags[b].count - aggregatedTags[a].count
+    );
+    
+    // Display tag performance
+    sortedTags.forEach(tagName => {
+      const tagInfo = aggregatedTags[tagName];
+      const percentage = tagInfo.maxScore > 0 ? 
+        Math.round((tagInfo.totalScore / tagInfo.maxScore) * 100) : 0;
+      
+      const tagElement = document.createElement('div');
+      tagElement.className = 'tag-performance-item';
+      
+      tagElement.innerHTML = `
+        <div class="tag-performance-header">
+          <span class="tag-name"><i class="fas fa-tag"></i> ${tagName}</span>
+          <span class="tag-stats">
+            <span style="color: var(--success);">G: ${tagInfo.good}</span>
+            <span style="color: var(--warning);">M: ${tagInfo.medium}</span>
+            <span style="color: var(--danger);">B: ${tagInfo.bad}</span>
+          </span>
+        </div>
+        <div class="tag-progress-bar">
+          <div class="tag-progress-fill" style="width: ${percentage}%"></div>
+        </div>
+        <div class="tag-details">
+          <span>Used ${tagInfo.count} times</span>
+          <span>Performance: ${percentage}%</span>
+        </div>
+      `;
+      
+      container.appendChild(tagElement);
+    });
+  }
+
+  function updateSessionsTable(history) {
+    const tbody = document.getElementById('sessions-tbody');
+    tbody.innerHTML = '';
+    
+    // Sort by date (newest first)
+    const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Show last 10 sessions
+    sortedHistory.slice(0, 10).forEach(session => {
+      const row = document.createElement('tr');
+      
+      const date = new Date(session.date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      const scoreClass = session.score >= 80 ? 'high' : session.score >= 60 ? 'medium' : 'low';
+      
+      row.innerHTML = `
+        <td>${date}</td>
+        <td><span class="scenario-badge">${scenarios[session.scenario]?.scenario_title || session.scenario}</span></td>
+        <td><span class="score-badge ${scoreClass}">${session.score}%</span></td>
+        <td><span class="time-badge"><i class="fas fa-clock"></i> ${formatDuration(session.time)}</span></td>
+        <td>${session.responses}</td>
+        <td>
+          <div style="display: flex; gap: 0.5rem;">
+            <span style="font-size: 0.75rem; color: var(--success);">G: ${session.good}</span>
+            <span style="font-size: 0.75rem; color: var(--warning);">M: ${session.medium}</span>
+            <span style="font-size: 0.75rem; color: var(--danger);">B: ${session.bad}</span>
+          </div>
+        </td>
+      `;
+      
+      tbody.appendChild(row);
+    });
+    
+    if (sortedHistory.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray-500);">No sessions found</td></tr>';
+    }
+  }
+
+  function switchChart(type) {
+    currentChartType = type;
+    
+    // Update button states
+    document.querySelectorAll('.chart-option').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update chart
+    updateAnalytics();
+  }
+
+  function formatDuration(seconds) {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${minutes}m`;
+    }
+  }
+
+  function exportData() {
+    const history = JSON.parse(localStorage.getItem('shingChatHistory') || '[]');
+    
+    // Create CSV content
+    const headers = ['Date', 'Scenario', 'Score', 'Duration (s)', 'Responses', 'Good', 'Medium', 'Bad'];
+    const rows = history.map(session => [
+      new Date(session.date).toISOString(),
+      session.scenario,
+      session.score,
+      session.time,
+      session.responses,
+      session.good,
+      session.medium,
+      session.bad
+    ]);
+    
+    const csvContent = [headers, ...rows]
+      .map(row => row.join(','))
+      .join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `shing-chat-analytics-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showToast('Data exported successfully!', 'success');
+  }
+
+  function clearHistory() {
+    if (confirm('Are you sure you want to clear all session history? This action cannot be undone.')) {
+      localStorage.removeItem('shingChatHistory');
+      updateAnalytics();
+      showToast('Session history has been cleared.', 'success');
+    }
+  }
+
+  // Documentation Download Function
+  function downloadScoringDoc() {
+    // Create Word document content
+    const docContent = `
+  <!DOCTYPE html>
+  <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+  <meta charset="utf-8">
+  <title>shing-chat Scoring System Documentation</title>
+  <style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+  h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+  h2 { color: #34495e; margin-top: 30px; }
+  h3 { color: #7f8c8d; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+  th { background-color: #f2f2f2; font-weight: bold; }
+  .formula { background-color: #e8f4fd; border: 2px solid #3498db; padding: 15px; margin: 15px 0; text-align: center; font-weight: bold; }
+  .example { background-color: #d5f4e6; border-left: 4px solid #27ae60; padding: 15px; margin: 15px 0; }
+  .warning { background-color: #fef9e7; border-left: 4px solid #f39c12; padding: 15px; margin: 15px 0; }
+  code { background-color: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+  pre { background-color: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; }
+  </style>
+  </head>
+  <body>
+  <h1>shing-chat Scoring System Documentation</h1>
+
+  <h2>Overview</h2>
+  <p>The shing-chat scoring system is designed to provide objective, consistent evaluation of clinical communication skills during roleplay scenarios. This document explains how scores are calculated, weighted, and interpreted.</p>
+
+  <h2>Scoring Architecture</h2>
+  <h3>Core Formula</h3>
+  <div class="formula">Response Score = Weight × Level</div>
+
+  <h3>Weight Categories</h3>
+  <table>
+  <tr><th>Weight</th><th>Value</th><th>Description</th><th>Examples</th></tr>
+  <tr><td><strong>High</strong></td><td>3 points</td><td>Critical communication moments</td><td>Building rapport, key decisions, safety concerns</td></tr>
+  <tr><td><strong>Medium</strong></td><td>2 points</td><td>Important but less critical</td><td>Information gathering, practical considerations</td></tr>
+  <tr><td><strong>Low</strong></td><td>1 point</td><td>Supportive interactions</td><td>Administrative tasks, closing remarks</td></tr>
+  </table>
+
+  <h3>Performance Levels</h3>
+  <table>
+  <tr><th>Level</th><th>Value</th><th>Description</th><th>Characteristics</th></tr>
+  <tr><td><strong>Good</strong></td><td>3 points</td><td>Excellent performance</td><td>Demonstrates best practices, achieves objectives</td></tr>
+  <tr><td><strong>Medium</strong></td><td>2 points</td><td>Adequate performance</td><td>Meets basic requirements, room for improvement</td></tr>
+  <tr><td><strong>Low</strong></td><td>1 point</td><td>Poor performance</td><td>Significant gaps, below expected standard</td></tr>
+  <tr><td><strong>Bad</strong></td><td>0 points</td><td>Incorrect approach</td><td>Potentially harmful, misses critical opportunities</td></tr>
+  </table>
+
+  <h2>Score Calculation Process</h2>
+  <h3>Step 1: Individual Response Evaluation</h3>
+  <div class="example">
+  <strong>Example: High Weight + Good Level</strong><br>
+  <strong>Response:</strong> "Good morning, Mr. Saad. How are you doing today?"<br>
+  <strong>Calculation:</strong> High Weight (3) × Good Level (3) = <strong>9 points</strong><br>
+  <strong>Feedback:</strong> "Excellent opening - establishes rapport and shows genuine concern"
+  </div>
+
+  <h3>Step 2: Session Score Accumulation</h3>
+  <div class="formula">Total Score = Σ (All Response Scores)</div>
+
+  <h3>Step 3: Final Percentage Calculation</h3>
+  <div class="formula">Final Score % = (Total Score ÷ Max Score) × 100</div>
+
+  <h2>Real-World Example</h2>
+  <p>Complete SAAD scenario session with 5 responses:</p>
+  <table>
+  <tr><th>Step</th><th>Weight</th><th>Response</th><th>Level</th><th>Score</th></tr>
+  <tr><td>1. Opening</td><td>High (3)</td><td>"Good morning, Mr. Saad..."</td><td>Good (3)</td><td><strong>9</strong></td></tr>
+  <tr><td>2. Empathy</td><td>High (3)</td><td>"Acknowledge aging..."</td><td>Good (3)</td><td><strong>9</strong></td></tr>
+  <tr><td>3. Education</td><td>High (3)</td><td>"Explain seriousness..."</td><td>Good (3)</td><td><strong>9</strong></td></tr>
+  <tr><td>4. Practical</td><td>Medium (2)</td><td>"Sounds promising..."</td><td>Good (3)</td><td><strong>6</strong></td></tr>
+  <tr><td>5. Decision</td><td>High (3)</td><td>"I think I need Shingrix."</td><td>Good (3)</td><td><strong>9</strong></td></tr>
+  </table>
+
+  <div class="formula">
+  <strong>Calculation:</strong><br>
+  Total Points: 9 + 9 + 9 + 6 + 9 = <strong>42 points</strong><br>
+  Maximum Possible: 42 points<br>
+  Final Score: (42 ÷ 42) × 100 = <strong>100%</strong>
+  </div>
+
+  <h2>Score Interpretation</h2>
+  <table>
+  <tr><th>Score Range</th><th>Performance Level</th><th>Description</th></tr>
+  <tr><td><strong>80-100%</strong></td><td>Outstanding</td><td>Exceptional clinical communication skills</td></tr>
+  <tr><td><strong>60-79%</strong></td><td>Good</td><td>Solid performance with effective strategies</td></tr>
+  <tr><td><strong>40-59%</strong></td><td>Fair</td><td>Basic competence, needs development</td></tr>
+  <tr><td><strong>0-39%</strong></td><td>Needs Work</td><td>Significant improvement required</td></tr>
+  </table>
+
+  <h2>Technical Implementation</h2>
+  <h3>JavaScript Calculation</h3>
+  <pre><code>function calculateSessionScore(responses, scoringRules) {
+    let totalScore = 0;
+    let maxScore = 0;
+    
+    responses.forEach(response => {
+      const weight = scoringRules.weights[response.score_weight];
+      const level = scoringRules.levels[response.score_level];
+      
+      totalScore += weight * level;
+      maxScore += weight * 3; // Maximum is always "Good"
+    });
+    
+    const percentage = maxScore > 0 ? 
+      Math.round((totalScore / maxScore) * 100) : 0;
+      
+    return { percentage, totalScore, maxScore };
+  }</code></pre>
+
+  <h2>Best Practices</h2>
+  <div class="example">
+  <h4>For Scenario Designers:</h4>
+  <ul>
+  <li>Balance weights: Ensure critical moments have higher weights</li>
+  <li>Clear criteria: Define specific requirements for each level</li>
+  <li>Consistent standards: Apply scoring criteria uniformly</li>
+  <li>Meaningful feedback: Provide actionable improvement suggestions</li>
+  </ul>
+  </div>
+
+  <div class="warning">
+  <h4>For Users:</h4>
+  <ul>
+  <li>Read feedback: Review specific feedback for each response</li>
+  <li>Practice consistently: Regular practice improves scores</li>
+  <li>Focus on patterns: Identify recurring areas for improvement</li>
+  <li>Apply learning: Use feedback in future sessions</li>
+  </ul>
+  </div>
+
+<h2>Conclusion</h2>
+<p>The shing-chat scoring system provides a comprehensive, fair, and educational approach to evaluating clinical communication skills. By understanding how scores are calculated and what they represent, users can focus their improvement efforts effectively.</p>
+
+<hr>
+<p><em>Document generated on ${new Date().toLocaleDateString()}</em></p>
+</body>
+</html>
+  `;
+
+  // Create blob with Word content type
+  const blob = new Blob([docContent], { 
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+  });
+  
+  // Create download link
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `shing-chat-scoring-documentation-${new Date().toISOString().split('T')[0]}.doc`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('Scoring documentation downloaded successfully!', 'success');
+}
+
+// Utility Functions
+function loadSavedProgress() {
+  const saved = localStorage.getItem('shingChatProgress');
+  if (saved) {
+    const data = JSON.parse(saved);
+    if (data.selectedRole && scenarios[data.selectedRole]) {
+      selectScenario(data.selectedRole);
+    }
+  }
+}
+
+function saveProgress() {
+  const data = {
+    selectedRole: selectedRole,
+    scoreData: scoreData,
+    timestamp: new Date().toISOString()
+  };
+  localStorage.setItem('shingChatProgress', JSON.stringify(data));
+}
+
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastIcon = document.getElementById('toast-icon');
+  const toastMessage = document.getElementById('toast-message');
+  
+  // Set icon and color based on type
+  if (type === 'success') {
+    toastIcon.className = 'toast-icon success';
+    toastIcon.innerHTML = '<i class="fas fa-check"></i>';
+  } else if (type === 'error') {
+    toastIcon.className = 'toast-icon error';
+    toastIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
+  }
+  
+  toastMessage.textContent = message;
+  toast.classList.add('show');
+  
+  // Hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+</script>
+</body>
+</html>
