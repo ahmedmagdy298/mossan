@@ -2694,6 +2694,38 @@
   </div>
 
   <script>
+    function renderTagMappingEditor(scoringRules = {}) {
+  const container = document.getElementById('tag-mapping-editor');
+  container.innerHTML = '';
+
+  const levels = ['Good', 'Medium', 'Low', 'Bad'];
+  const weights = ['High', 'Medium', 'Low'];
+
+  const tagMapping = ensureScoringDefaults(scoringRules).tag_mapping;
+
+  weights.forEach(weight => {
+    levels.forEach(level => {
+      const key = `${weight}_${level}`;
+      const tag = tagMapping[key]?.tag || '';
+      const link = tagMapping[key]?.link || '';
+
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '0.5rem';
+      row.style.marginBottom = '0.5rem';
+      row.style.alignItems = 'center';
+
+      row.innerHTML = `
+        <span style="width: 100px;"><strong>${weight} + ${level}</strong></span>
+        <input type="text" class="form-input" style="flex:1" placeholder="Tag Name" value="${tag}" id="tag-name-${key}">
+        <input type="text" class="form-input" style="flex:2" placeholder="Link" value="${link}" id="tag-link-${key}">
+      `;
+
+      container.appendChild(row);
+    });
+  });
+}
+
   // Default Scenarios
   const defaultScenarios = {
     doctor: {
